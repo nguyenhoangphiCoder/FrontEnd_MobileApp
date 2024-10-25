@@ -8,8 +8,9 @@ import {
   TextInput,
   Image,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { NavigationProp } from "@react-navigation/native";
+
 interface SignUpProps {
   navigation: NavigationProp<any>;
 }
@@ -19,19 +20,9 @@ export default function SignUp({ navigation }: SignUpProps) {
       <View style={{ flexDirection: "row" }}>
         <TouchableOpacity
           onPress={() => navigation.navigate("Login")}
-          style={{
-            marginTop: 55,
-            marginLeft: 20,
-          }}
+          style={{ marginTop: 55, marginLeft: 20 }}
         >
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "900",
-            }}
-          >
-            Back
-          </Text>
+          <Text style={{ fontSize: 20, fontWeight: "900" }}>Back</Text>
         </TouchableOpacity>
         <Image
           source={require("../../images/Logo.png")}
@@ -55,124 +46,64 @@ export default function SignUp({ navigation }: SignUpProps) {
         </Text>
       </View>
       <View style={{ marginHorizontal: 50, marginTop: 80 }}>
-        <View
-          style={{
-            height: 45,
-            borderRadius: 20,
-            borderColor: "#230C02",
-            borderWidth: 1,
-          }}
-        >
-          <TextInput
-            placeholder="Your name"
-            style={{
-              height: 40,
-              padding: 10,
-              marginBottom: 10,
-            }}
-          />
-        </View>
-        <View
-          style={{
-            height: 45,
-            borderRadius: 20,
-            borderColor: "#230C02",
-            borderWidth: 1,
-            marginTop: 15,
-          }}
-        >
-          <TextInput
-            placeholder="Your Email"
-            style={{
-              height: 40,
-              padding: 10,
-              marginBottom: 10,
-            }}
-          />
-        </View>
-        <View
-          style={{
-            height: 45,
-            borderRadius: 20,
-            borderColor: "#230C02",
-            borderWidth: 1,
-            marginTop: 15,
-          }}
-        >
-          <TextInput
-            placeholder="Your password"
-            style={{
-              height: 40,
-              padding: 10,
-              marginBottom: 10,
-            }}
-          />
-        </View>
-        <View
-          style={{
-            height: 45,
-            borderRadius: 20,
-            borderColor: "#230C02",
-            borderWidth: 1,
-            marginTop: 15,
-          }}
-        >
-          <TextInput
-            placeholder="Your phone number"
-            style={{
-              height: 40,
-              padding: 10,
-              marginBottom: 10,
-            }}
-          />
-        </View>
+        <TextInput placeholder="Your name" style={styles.input} />
+        <TextInput placeholder="Your Email" style={styles.input} />
+        <TextInput
+          placeholder="Your password"
+          secureTextEntry
+          style={styles.input}
+        />
+        <TextInput placeholder="Your phone number" style={styles.input} />
 
         <TouchableOpacity>
-          <View
-            style={{
-              backgroundColor: "#230C02",
-              marginTop: 30,
-              height: 40,
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: 20,
-            }}
-          >
-            <Text
-              style={{
-                color: "#EDDCC6",
-                fontSize: 15,
-                fontWeight: "bold",
-              }}
-            >
-              Create an account
-            </Text>
+          <View style={styles.button}>
+            <Text style={styles.buttonText}>Create an account</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity>
-          <View
-            style={{
-              marginTop: 30,
-              height: 40,
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: 20,
-              borderColor: "#230C02",
-              borderWidth: 2,
-            }}
-          >
-            <Text
-              style={{
-                color: "#230C02",
-                fontSize: 15,
-                fontWeight: "bold",
-              }}
-            >
-              Login
-            </Text>
+          <View style={styles.loginButton}>
+            <Text style={styles.loginButtonText}>Login</Text>
           </View>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  input: {
+    height: 45,
+    borderRadius: 20,
+    borderColor: "#230C02",
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 15,
+  },
+  button: {
+    backgroundColor: "#230C02",
+    marginTop: 30,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+  },
+  buttonText: {
+    color: "#EDDCC6",
+    fontSize: 15,
+    fontWeight: "bold",
+  },
+  loginButton: {
+    marginTop: 30,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+    borderColor: "#230C02",
+    borderWidth: 2,
+  },
+  loginButtonText: {
+    color: "#230C02",
+    fontSize: 15,
+    fontWeight: "bold",
+  },
+});

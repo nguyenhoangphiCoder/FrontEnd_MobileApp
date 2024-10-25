@@ -1,32 +1,46 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import Login from "../views/Login/Login";
-import SignUp from "../views/signUp/SignUp";
-import React from "react";
-import Home from "../views/Home/Home";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-const tab = createBottomTabNavigator();
-function BottomTab() {
+import React from "react";
+
+import Login from "../views/Login/Login";
+import "react-native-gesture-handler";
+import Home from "../views/Home/Home";
+import Order from "../views/orders/Order";
+import SignUp from "../views/signUp/SignUp";
+import Coffee from "../views/CoffeeCaStegories/Coffee";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import CartItem from "../views/Cart/CartItem";
+
+const Drawer = createDrawerNavigator();
+const MyDrawer = () => {
   return (
-    <tab.Navigator screenOptions={{ headerShown: false }}>
-      <tab.Screen name="Home" component={Home} />
-      <tab.Screen name="Login" component={Login} />
-      <tab.Screen name="SignUp" component={SignUp} />
-    </tab.Navigator>
+    <Drawer.Navigator
+      initialRouteName="Home"
+      screenOptions={{ headerShown: false }}
+    >
+      <Drawer.Screen name="Home" component={Home} />
+      <Drawer.Screen name="Coffee" component={Coffee} />
+      <Drawer.Screen name="Order" component={Order} />
+    </Drawer.Navigator>
   );
-}
-const stack = createStackNavigator();
+};
+const Stack = createStackNavigator();
+
 const NavigationStack = () => {
   return (
     <NavigationContainer>
-      <stack.Navigator
-        initialRouteName="Home"
+      <Stack.Navigator
+        initialRouteName="Login"
         screenOptions={{ headerShown: false }}
       >
-        <stack.Screen name="TabBottom" component={BottomTab} />
-      </stack.Navigator>
+        <Stack.Screen name="Cart" component={CartItem} />
+        <Stack.Screen name="SignUp" component={SignUp} />
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="MyDrawer" component={MyDrawer} />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 };
+
 export default NavigationStack;

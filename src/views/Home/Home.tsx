@@ -11,9 +11,16 @@ import {
 } from "react-native";
 import React from "react";
 import { NavigationProp } from "@react-navigation/native";
-
+import { DrawerNavigationProp } from "@react-navigation/drawer";
+type RootDrawerParamList = {
+  // Thêm các màn hình khác nếu cần
+  Home: undefined;
+  Order: undefined;
+  Coffee: undefined;
+  Cart: undefined;
+};
 interface HomeProps {
-  navigation: NavigationProp<any>;
+  navigation: DrawerNavigationProp<RootDrawerParamList>;
 }
 export default function Home({ navigation }: HomeProps) {
   return (
@@ -23,22 +30,22 @@ export default function Home({ navigation }: HomeProps) {
       <View
         style={{ backgroundColor: "#230C02", height: 60, flexDirection: "row" }}
       >
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.openDrawer();
+          }}
+        >
           <View
             style={{
-              height: 40,
-              width: 40,
               backgroundColor: "#fff",
-              borderRadius: 100,
-              alignItems: "center",
-              justifyContent: "center",
-              marginVertical: 13,
-              marginHorizontal: 10,
+              marginTop: 17,
+              borderRadius: 5,
+              marginLeft: 10,
             }}
           >
             <Image
-              source={require("../../images/accountIcon.png")}
-              style={{ height: 25, width: 25 }}
+              source={require("../../images/mobile.png")}
+              style={{ height: 30, width: 30 }}
             />
           </View>
         </TouchableOpacity>
@@ -47,8 +54,8 @@ export default function Home({ navigation }: HomeProps) {
             borderRadius: 10,
             borderColor: "#fff",
             borderWidth: 1,
-            width: 275,
-            marginLeft: 40,
+            width: 290,
+            marginLeft: 10,
             marginTop: 15,
             marginBottom: 10,
             backgroundColor: "#fff",
@@ -59,9 +66,33 @@ export default function Home({ navigation }: HomeProps) {
             style={{
               height: 30,
               paddingHorizontal: 15,
+              width: 290,
             }}
           />
         </View>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("Cart");
+          }}
+        >
+          <View
+            style={{
+              height: 35,
+              width: 35,
+              backgroundColor: "#f9f9fc",
+              borderRadius: 5,
+              alignItems: "center",
+              justifyContent: "center",
+              marginVertical: 15,
+              marginHorizontal: 10,
+            }}
+          >
+            <Image
+              source={require("../../images/cart2.jpg")}
+              style={{ height: 28, width: 28 }}
+            />
+          </View>
+        </TouchableOpacity>
       </View>
       <ScrollView>
         {/* coffee card */}
@@ -110,15 +141,26 @@ export default function Home({ navigation }: HomeProps) {
                 "Powered by Code, Fueled by Coffee."
               </Text>
             </View>
-            <Image
-              source={require("../../images/Logo.png")}
+            <View
               style={{
-                width: 120,
-                height: 120,
-                marginTop: 40,
-                marginLeft: 25,
+                width: 135,
+                height: 130,
+                marginTop: 30,
+                marginLeft: 20,
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 20,
+                backgroundColor: "#D3C0AB",
               }}
-            />
+            >
+              <Image
+                source={require("../../images/Logo1.png")}
+                style={{
+                  width: 120,
+                  height: 120,
+                }}
+              />
+            </View>
           </View>
         </View>
         {/* categories */}
@@ -137,6 +179,9 @@ export default function Home({ navigation }: HomeProps) {
               }}
             >
               <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Coffee");
+                }}
                 style={{ alignItems: "center", justifyContent: "center" }}
               >
                 <View
