@@ -6,11 +6,11 @@ import React from "react";
 import Login from "../views/Login/Login";
 import "react-native-gesture-handler";
 import Home from "../views/Home/Home";
-import Order from "../views/orders/Order";
+import Order from "../Component/Order";
 import SignUp from "../views/signUp/SignUp";
 import Coffee from "../views/CoffeeCaStegories/Coffee";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import CartItem from "../views/Cart/CartItem";
+import CartItem from "../Component/CartItem";
 
 const Drawer = createDrawerNavigator();
 const MyDrawer = () => {
