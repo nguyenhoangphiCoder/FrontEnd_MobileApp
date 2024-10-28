@@ -18,6 +18,10 @@ type RootDrawerParamList = {
   Order: undefined;
   Coffee: undefined;
   Cart: undefined;
+  Tea: undefined;
+  Phindi: undefined;
+  MilkTea: undefined;
+  Freeze: undefined;
 };
 interface HomeProps {
   navigation: DrawerNavigationProp<RootDrawerParamList>;
@@ -207,6 +211,9 @@ export default function Home({ navigation }: HomeProps) {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("MilkTea");
+                }}
                 style={{ alignItems: "center", justifyContent: "center" }}
               >
                 <View
@@ -233,6 +240,9 @@ export default function Home({ navigation }: HomeProps) {
               </TouchableOpacity>
               <TouchableOpacity
                 style={{ alignItems: "center", justifyContent: "center" }}
+                onPress={() => {
+                  navigation.navigate("Phindi");
+                }}
               >
                 <View
                   style={{
@@ -257,6 +267,9 @@ export default function Home({ navigation }: HomeProps) {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Tea");
+                }}
                 style={{ alignItems: "center", justifyContent: "center" }}
               >
                 <View
@@ -282,6 +295,9 @@ export default function Home({ navigation }: HomeProps) {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Freeze");
+                }}
                 style={{ alignItems: "center", justifyContent: "center" }}
               >
                 <View
@@ -296,7 +312,7 @@ export default function Home({ navigation }: HomeProps) {
                   }}
                 >
                   <Image
-                    source={require("../../images/ProductImage/Tea/iconteacategories.jpg")}
+                    source={require("../../images/ProductImage/Freeze/FREEZE.png")}
                     style={{ height: 40, width: 40 }}
                   />
                 </View>

@@ -15,12 +15,12 @@ type RootDrawerParamList = {
   Home: undefined;
   Order: undefined;
   Coffee: undefined;
-  CartItem: undefined;
+  Cart: undefined;
 };
 interface CoffeeCategoriesProps {
   navigation: DrawerNavigationProp<RootDrawerParamList>;
 }
-export default function Coffee({ navigation }: CoffeeCategoriesProps) {
+export default function Tea({ navigation }: CoffeeCategoriesProps) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
@@ -36,7 +36,7 @@ export default function Coffee({ navigation }: CoffeeCategoriesProps) {
           <View style={styles.searchBox}>
             <TextInput placeholder="Search" style={styles.searchInput} />
           </View>
-          <TouchableOpacity onPress={() => navigation.navigate("CartItem")}>
+          <TouchableOpacity onPress={() => navigation.navigate("Cart")}>
             <View style={styles.cartButton}>
               <Image
                 source={require("../../images/cart2.jpg")}
@@ -46,14 +46,14 @@ export default function Coffee({ navigation }: CoffeeCategoriesProps) {
           </TouchableOpacity>
         </View>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>COFFEE</Text>
+          <Text style={styles.title}>TEA</Text>
         </View>
       </View>
       <ScrollView>
         <View style={styles.productList}>
           <View style={styles.productItem}>
             <Image
-              source={require("../../images/ProductImage/Coffee/iconcoffeecategories.jpg")}
+              source={require("../../images/ProductImage/Tea/iconteacategories.jpg")}
               style={styles.productImage}
             />
             <View style={styles.productInfo}>
@@ -75,7 +75,7 @@ export default function Coffee({ navigation }: CoffeeCategoriesProps) {
           </View>
           <View style={styles.productItem}>
             <Image
-              source={require("../../images/ProductImage/Coffee/iconcoffeecategories.jpg")}
+              source={require("../../images/ProductImage/Tea/iconteacategories.jpg")}
               style={styles.productImage}
             />
             <View style={styles.productInfo}>
