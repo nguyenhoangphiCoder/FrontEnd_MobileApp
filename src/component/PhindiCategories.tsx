@@ -10,23 +10,57 @@ import {
 } from "react-native";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 
+// Định nghĩa kiểu cho sản phẩm
+interface CartItem {
+  id: number;
+  name: string;
+  quantity: number;
+  size: string;
+  note: string;
+  price: number;
+  image: any;
+}
+
 type RootDrawerParamList = {
   Home: undefined;
-  Espresso: undefined;
+  Cart: {
+    cartItems: CartItem[]; // Sử dụng kiểu đã định nghĩa
+  };
 };
 
-interface PhindiCategoriesProps {
+interface FreezeCategoriesProps {
   navigation: DrawerNavigationProp<RootDrawerParamList>;
 }
 
-export default function PhindiCategories({
+export default function FreezeCategories({
   navigation,
-}: PhindiCategoriesProps) {
+}: FreezeCategoriesProps) {
   const [quantity, setQuantity] = useState(1);
-
+  // Chỉ định kiểu cho cartItems
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [size, setSize] = useState("M"); // State cho kích thước
+  const [note, setNote] = useState(""); // State cho ghi chú
   const increaseQuantity = () => setQuantity(quantity + 1);
   const decreaseQuantity = () => {
     if (quantity > 1) setQuantity(quantity - 1);
+  };
+
+  const addToCart = () => {
+    const newItem: CartItem = {
+      id: Date.now(), // ID duy nhất
+      name: "Matcha",
+      quantity: quantity,
+      size: size,
+      note: note,
+      price: 50000,
+      image: require("../images/ProductImage/Freeze/FREEZE.png"),
+    };
+
+    const updatedCartItems = [...cartItems, newItem]; // Cập nhật giỏ hàng
+    setCartItems(updatedCartItems); // Cập nhật state
+
+    // Điều hướng với đúng kiểu
+    navigation.navigate("Cart", { cartItems: updatedCartItems });
   };
 
   return (
@@ -72,7 +106,9 @@ export default function PhindiCategories({
           >
             <TextInput placeholder="Search" style={{ flex: 1, height: 40 }} />
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Cart", { cartItems })}
+          >
             <View
               style={{
                 height: 35,
@@ -106,7 +142,7 @@ export default function PhindiCategories({
               color: "#FFF",
             }}
           >
-            PHINDI
+            FREEZE
           </Text>
         </View>
       </View>
@@ -136,7 +172,7 @@ export default function PhindiCategories({
               }}
             >
               <Image
-                source={require("../images/ProductImage/phindi/phindicategories.jpg")}
+                source={require("../images/ProductImage/Coffee/iconcoffeecategories.jpg")}
                 style={{ width: 250, height: 250, borderRadius: 10 }}
               />
             </View>
@@ -149,7 +185,7 @@ export default function PhindiCategories({
                   marginBottom: 5,
                 }}
               >
-                Phindi
+                Espresso
               </Text>
               <Text
                 style={{
@@ -170,14 +206,7 @@ export default function PhindiCategories({
                 }}
                 numberOfLines={3}
               >
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Modi
-                inventore, sed odio necessitatibus quaerat natus ipsum error.
-                Numquam consequatur, impedit obcaecati quod molestiae magnam,
-                ad, omnis dolore repellendus inventore tempora. Sunt quam ut
-                delectus perspiciatis amet accusantium exercitationem, corporis
-                porro nostrum hic non numquam alias eaque cum ab impedit
-                voluptates reiciendis magnam praesentium tempore illum aut iure
-                minima? Perspiciatis, voluptate?
+                Description: Hot milk coffee with a rich and intense flavor.
               </Text>
             </View>
 
@@ -232,45 +261,23 @@ export default function PhindiCategories({
               }}
             >
               <Text style={{ fontSize: 16, fontWeight: "600" }}>Size: </Text>
-              <TouchableOpacity
-                style={{
-                  height: 25,
-                  width: 25,
-                  backgroundColor: "#230C02",
-                  borderRadius: 5,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginHorizontal: 5,
-                }}
-              >
-                <Text style={{ color: "#fff" }}>S</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  height: 25,
-                  width: 25,
-                  backgroundColor: "#230C02",
-                  borderRadius: 5,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginHorizontal: 5,
-                }}
-              >
-                <Text style={{ color: "#fff" }}>M</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  height: 25,
-                  width: 25,
-                  backgroundColor: "#230C02",
-                  borderRadius: 5,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginHorizontal: 5,
-                }}
-              >
-                <Text style={{ color: "#fff" }}>L</Text>
-              </TouchableOpacity>
+              {["S", "M", "L"].map((s) => (
+                <TouchableOpacity
+                  key={s}
+                  onPress={() => setSize(s)}
+                  style={{
+                    height: 25,
+                    width: 25,
+                    backgroundColor: size === s ? "#230C02" : "#CCC",
+                    borderRadius: 5,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginHorizontal: 5,
+                  }}
+                >
+                  <Text style={{ color: "#fff" }}>{s}</Text>
+                </TouchableOpacity>
+              ))}
             </View>
 
             <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 5 }}>
@@ -287,7 +294,7 @@ export default function PhindiCategories({
                 marginBottom: 15,
               }}
             />
-            <TouchableOpacity>
+            <TouchableOpacity onPress={addToCart}>
               <View
                 style={{
                   backgroundColor: "#230C02",
