@@ -25,7 +25,7 @@ export default function SignUp({ navigation }: SignUpProps) {
           <Text style={{ fontSize: 20, fontWeight: "900" }}>Back</Text>
         </TouchableOpacity>
         <Image
-          source={require("../../images/Logo.png")}
+          source={require("../images/Logo1.png")}
           style={{
             width: 40,
             height: 40,

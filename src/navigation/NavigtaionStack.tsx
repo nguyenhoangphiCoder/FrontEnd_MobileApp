@@ -1,20 +1,22 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
-import Login from "../views/Login";
-import "react-native-gesture-handler";
-import Home from "../views/Home";
-import SignUp from "../views/signUp/SignUp";
-import Coffee from "../views/CoffeeCaStegories/Coffee";
+import Login from "../Screens/Login";
+import Home from "../Screens/Home";
+import SignUp from "../component/SignUp";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import Tea from "../views/teaCart/tea";
-import Phindi from "../views/PhinDi/Phindi";
-import MilkTea from "../views/MilkTEa/milktea";
-import Freeze from "../views/FREEZE/FREEZE";
-import Cart from "../views/Cart";
-import Payment from "../views/payment";
+import CoffeeCategories from "../component/CoffeeCategories";
+import TeaCategories from "../component/TeaCategories";
+import PhindiCategories from "../component/PhindiCategories";
+import MilkTeaCategories from "../component/MilkteaCategories";
+import FreezeCategories from "../component/FreezeCategories";
+import UserProfile from "../Screens/UserProfile";
+import UpdateUserProfile from "../component/UpdateUserprofile";
+import Cart from "../component/Cart";
 
+const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
+
 const MyDrawer = () => {
   return (
     <Drawer.Navigator
@@ -22,16 +24,10 @@ const MyDrawer = () => {
       screenOptions={{ headerShown: false }}
     >
       <Drawer.Screen name="Home" component={Home} />
-      <Drawer.Screen name="Coffee" component={Coffee} />
-      <Drawer.Screen name="Tea" component={Tea} />
-      <Drawer.Screen name="Phindi" component={Phindi} />
-      <Drawer.Screen name="MilkTea" component={MilkTea} />
-
-      <Drawer.Screen name="Freeze" component={Freeze} />
+      <Drawer.Screen name="UserProfile" component={UserProfile} />
     </Drawer.Navigator>
   );
 };
-const Stack = createStackNavigator();
 
 const NavigationStack = () => {
   return (
@@ -40,11 +36,16 @@ const NavigationStack = () => {
         initialRouteName="Login"
         screenOptions={{ headerShown: false }}
       >
-        <Stack.Screen name="CartItem" component={Cart} />
+        <Stack.Screen name="CoffeeCategories" component={CoffeeCategories} />
+        <Stack.Screen name="TeaCategories" component={TeaCategories} />
+        <Stack.Screen name="MilkteaCategories" component={MilkTeaCategories} />
+        <Stack.Screen name="PhindiCategories" component={PhindiCategories} />
+        <Stack.Screen name="FreezeCategories" component={FreezeCategories} />
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Payment" component={Payment} />
+        <Stack.Screen name="Cart" component={Cart} />
         <Stack.Screen name="MyDrawer" component={MyDrawer} />
+        <Stack.Screen name="UpdateUserProfile" component={UpdateUserProfile} />
       </Stack.Navigator>
     </NavigationContainer>
   );
