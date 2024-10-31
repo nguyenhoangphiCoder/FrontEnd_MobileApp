@@ -8,48 +8,52 @@ import {
   Alert,
 } from "react-native";
 import React, { useState } from "react";
-import { CommonActions, NavigationProp } from "@react-navigation/native";
-import api from "../api";
 import axios from "axios";
+import { DrawerNavigationProp } from "@react-navigation/drawer";
+
+type RootDrawerParamList = {
+  Home: undefined;
+  SignUp: undefined;
+  MyDrawer: undefined;
+};
 
 interface LoginProps {
-  navigation: NavigationProp<any>;
+  navigation: DrawerNavigationProp<RootDrawerParamList>;
 }
 
-export default function Login({ navigation }: LoginProps) {
+export default function Login({ navigation }: any) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
   const api = axios.create({
-    baseURL: "http://192.168.1.5:3000",
-    // Thay URL này bằng URL thực tế của backend của bạn
+    baseURL: "http://192.168.1.5:3000", // Địa chỉ API của bạn
     headers: {
       "Content-Type": "application/json",
     },
   });
-  // Hàm xử lý đăng nhập
+
   const handleLogin = async () => {
-    const trimmedEmail = email.trim(); // Loại bỏ khoảng trắng
+    const trimmedEmail = email.trim();
     const trimmedPassword = password.trim();
 
-    console.log("Email:", trimmedEmail); // Log email đã trim
-    console.log("Password:", trimmedPassword); // Log password đã trim
+    const data = {
+      email: trimmedEmail,
+      password: trimmedPassword,
+    };
+
+    console.log(data);
 
     try {
-      const response = await api.post("users/sign-in", {
-        email: trimmedEmail, // Sử dụng email đã trim
-        password: trimmedPassword, // Sử dụng password đã trim
-      });
+      const response = await api.post("users/sign-in", data);
 
-      console.log("Response:", response.data); // Log response
-      if (response.status === 200) {
-        console.log("Điều hướng đến MyDrawer");
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{ name: "MyDrawer" }], // Chuyển đến MyDrawer
-          })
-        );
+      // console.log(response.data);
+      // cho nay server tra ra khong dung chuan RESful API
+
+      if (response.data) {
+        // khong chay vao day
+        console.log("123445");
+        console.log("Đăng nhập thành công");
+        navigation.navigate("MyDrawer"); // Điều hướng đến MyDrawer
       }
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response) {
@@ -65,23 +69,16 @@ export default function Login({ navigation }: LoginProps) {
 
   return (
     <SafeAreaView style={{ backgroundColor: "#EDDCC6", flex: 1 }}>
-      <View
+      <Image
+        source={require("../images/Logo1.png")}
         style={{
           marginTop: 80,
-          justifyContent: "center",
-          backgroundColor: "#D3C0AB",
-          alignItems: "center",
           width: 180,
           height: 177,
           marginLeft: 110,
           borderRadius: 15,
         }}
-      >
-        <Image
-          source={require("../images/Logo1.png")}
-          style={{ width: 170, height: 170 }}
-        />
-      </View>
+      />
       <View
         style={{
           marginTop: 20,
@@ -100,84 +97,74 @@ export default function Login({ navigation }: LoginProps) {
         <Text style={{ fontSize: 15, fontWeight: "bold", color: "#230C02" }}>
           Email
         </Text>
-        <View style={{ marginTop: 10, height: 45, borderRadius: 5 }}>
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            placeholder="Your Email"
-            style={{
-              height: 40,
-              borderBottomColor: "gray",
-              borderBottomWidth: 1,
-              padding: 10,
-              marginBottom: 10,
-            }}
-          />
-        </View>
+        <TextInput
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          placeholder="Your Email"
+          style={{
+            height: 40,
+            borderBottomColor: "gray",
+            borderBottomWidth: 1,
+            padding: 10,
+            marginBottom: 10,
+          }}
+        />
         <Text
-          style={[
-            { fontSize: 15, fontWeight: "bold", color: "#230C02" },
-            { marginTop: 20 },
-          ]}
+          style={{
+            fontSize: 15,
+            fontWeight: "bold",
+            color: "#230C02",
+            marginTop: 20,
+          }}
         >
           Password
         </Text>
-        <View style={{ marginTop: 10, height: 45, borderRadius: 5 }}>
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            placeholder="Your Password"
-            style={{
-              height: 40,
-              borderBottomColor: "gray",
-              borderBottomWidth: 1,
-              padding: 10,
-              marginBottom: 10,
-            }}
-          />
-        </View>
-
-        <TouchableOpacity onPress={handleLogin}>
-          <View
-            style={{
-              backgroundColor: "#230C02",
-              marginTop: 30,
-              height: 40,
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: 20,
-            }}
-          >
-            <Text
-              style={{ color: "#EDDCC6", fontSize: 15, fontWeight: "bold" }}
-            >
-              Login
-            </Text>
-          </View>
+        <TextInput
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          placeholder="Your Password"
+          style={{
+            height: 40,
+            borderBottomColor: "gray",
+            borderBottomWidth: 1,
+            padding: 10,
+            marginBottom: 10,
+          }}
+        />
+        <TouchableOpacity
+          onPress={handleLogin}
+          style={{
+            backgroundColor: "#230C02",
+            marginTop: 30,
+            height: 40,
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: 20,
+          }}
+        >
+          <Text style={{ color: "#EDDCC6", fontSize: 15, fontWeight: "bold" }}>
+            Login
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-          <View
-            style={{
-              marginTop: 30,
-              height: 40,
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: 20,
-              borderColor: "#230C02",
-              borderWidth: 2,
-            }}
-          >
-            <Text
-              style={{ color: "#230C02", fontSize: 15, fontWeight: "bold" }}
-            >
-              Create an account
-            </Text>
-          </View>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("SignUp")}
+          style={{
+            marginTop: 30,
+            height: 40,
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: 20,
+            borderColor: "#230C02",
+            borderWidth: 2,
+          }}
+        >
+          <Text style={{ color: "#230C02", fontSize: 15, fontWeight: "bold" }}>
+            Create an account
+          </Text>
         </TouchableOpacity>
       </View>
-
       <TouchableOpacity
         style={{
           alignItems: "center",
