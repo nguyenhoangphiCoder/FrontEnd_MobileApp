@@ -33,19 +33,18 @@ export default function Cart({ navigation }: CartProps) {
         }}
       >
         <TouchableOpacity
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => {
+            navigation.navigate("Home");
+          }}
           style={{
-            backgroundColor: "#230C02",
-            height: 40,
-            width: 60,
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 10,
+            padding: 5,
+            marginRight: 10,
           }}
         >
-          <Text style={{ fontSize: 15, fontWeight: "bold", color: "#fff" }}>
-            Back
-          </Text>
+          <Image
+            source={require("../images/vector-back-icon.jpg")}
+            style={{ height: 37, width: 37, borderRadius: 5 }}
+          />
         </TouchableOpacity>
         <Text
           style={{
@@ -153,6 +152,7 @@ export default function Cart({ navigation }: CartProps) {
             justifyContent: "center",
             marginLeft: 20,
           }}
+          onPress={() => navigation.navigate("Order")}
         >
           <Text style={{ fontSize: 16, fontWeight: "bold", color: "#fff" }}>
             Check Out

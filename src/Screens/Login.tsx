@@ -5,15 +5,64 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
+  Alert,
 } from "react-native";
-import React from "react";
-import { NavigationProp } from "@react-navigation/native";
+import React, { useState } from "react";
+import { CommonActions, NavigationProp } from "@react-navigation/native";
+import api from "../api";
+import axios from "axios";
 
 interface LoginProps {
   navigation: NavigationProp<any>;
 }
 
 export default function Login({ navigation }: LoginProps) {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const api = axios.create({
+    baseURL: "http://192.168.1.5:3000",
+    // Thay URL này bằng URL thực tế của backend của bạn
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  // Hàm xử lý đăng nhập
+  const handleLogin = async () => {
+    const trimmedEmail = email.trim(); // Loại bỏ khoảng trắng
+    const trimmedPassword = password.trim();
+
+    console.log("Email:", trimmedEmail); // Log email đã trim
+    console.log("Password:", trimmedPassword); // Log password đã trim
+
+    try {
+      const response = await api.post("users/sign-in", {
+        email: trimmedEmail, // Sử dụng email đã trim
+        password: trimmedPassword, // Sử dụng password đã trim
+      });
+
+      console.log("Response:", response.data); // Log response
+      if (response.status === 200) {
+        console.log("Điều hướng đến MyDrawer");
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "MyDrawer" }], // Chuyển đến MyDrawer
+          })
+        );
+      }
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response) {
+        const errorMessage =
+          error.response.data.message || "Email hoặc mật khẩu không chính xác.";
+        Alert.alert("Lỗi", errorMessage);
+      } else {
+        Alert.alert("Lỗi", "Không thể đăng nhập. Vui lòng thử lại.");
+      }
+      console.error(error);
+    }
+  };
+
   return (
     <SafeAreaView style={{ backgroundColor: "#EDDCC6", flex: 1 }}>
       <View
@@ -53,6 +102,9 @@ export default function Login({ navigation }: LoginProps) {
         </Text>
         <View style={{ marginTop: 10, height: 45, borderRadius: 5 }}>
           <TextInput
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
             placeholder="Your Email"
             style={{
               height: 40,
@@ -73,6 +125,9 @@ export default function Login({ navigation }: LoginProps) {
         </Text>
         <View style={{ marginTop: 10, height: 45, borderRadius: 5 }}>
           <TextInput
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
             placeholder="Your Password"
             style={{
               height: 40,
@@ -84,7 +139,7 @@ export default function Login({ navigation }: LoginProps) {
           />
         </View>
 
-        <TouchableOpacity onPress={() => navigation.navigate("MyDrawer")}>
+        <TouchableOpacity onPress={handleLogin}>
           <View
             style={{
               backgroundColor: "#230C02",

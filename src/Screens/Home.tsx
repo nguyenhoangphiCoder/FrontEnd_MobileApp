@@ -273,7 +273,7 @@ export default function Home({ navigation }: HomeProps) {
                 <Text
                   style={{ marginLeft: 16, fontWeight: "bold", color: "#FFF" }}
                 >
-                  FREZZE
+                  FREEZE
                 </Text>
               </TouchableOpacity>
             </View>
@@ -347,41 +347,37 @@ export default function Home({ navigation }: HomeProps) {
           >
             <View style={{ flexDirection: "row" }}>
               {filteredProducts.map((product) => (
-                <TouchableOpacity key={product.id}>
-                  <View
+                <TouchableOpacity
+                  key={product.id}
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: 10,
+                    margin: 10,
+                  }}
+                >
+                  <Image
+                    source={product.image}
+                    style={{ width: 150, height: 150 }}
+                  />
+                  <Text
                     style={{
-                      backgroundColor: "#FFF",
-                      width: 150,
-                      height: 150,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 10,
-                      margin: 10,
+                      color: "#230C02",
+                      fontSize: 13,
+                      fontWeight: "bold",
                     }}
                   >
-                    <Image
-                      source={product.image}
-                      style={{ width: 80, height: 80 }}
-                    />
-                    <Text
-                      style={{
-                        color: "#230C02",
-                        fontSize: 13,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {product.name}
-                    </Text>
-                    <Text
-                      style={{
-                        color: "#230C02",
-                        fontSize: 10,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {product.price}
-                    </Text>
-                  </View>
+                    {product.name}
+                  </Text>
+                  <Text
+                    style={{
+                      color: "#230C02",
+                      fontSize: 10,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {product.price}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>

@@ -77,20 +77,19 @@ export default function FreezeCategories({
             paddingHorizontal: 10,
           }}
         >
-          <TouchableOpacity onPress={() => navigation.openDrawer()}>
-            <View
-              style={{
-                backgroundColor: "#fff",
-                borderRadius: 5,
-                padding: 5,
-                marginRight: 10,
-              }}
-            >
-              <Image
-                source={require("../images/mobile.png")}
-                style={{ height: 30, width: 30 }}
-              />
-            </View>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("Home");
+            }}
+            style={{
+              padding: 5,
+              marginRight: 10,
+            }}
+          >
+            <Image
+              source={require("../images/vector-back-icon.jpg")}
+              style={{ height: 37, width: 37, borderRadius: 5 }}
+            />
           </TouchableOpacity>
           <View
             style={{
@@ -108,23 +107,19 @@ export default function FreezeCategories({
           </View>
           <TouchableOpacity
             onPress={() => navigation.navigate("Cart", { cartItems })}
+            style={{
+              height: 35,
+              width: 35,
+
+              alignItems: "center",
+              justifyContent: "center",
+              marginLeft: 10,
+            }}
           >
-            <View
-              style={{
-                height: 35,
-                width: 35,
-                backgroundColor: "#f9f9fc",
-                borderRadius: 5,
-                alignItems: "center",
-                justifyContent: "center",
-                marginLeft: 10,
-              }}
-            >
-              <Image
-                source={require("../images/cart2.jpg")}
-                style={{ height: 28, width: 28 }}
-              />
-            </View>
+            <Image
+              source={require("../images/cart2.jpg")}
+              style={{ height: 40, width: 40, borderRadius: 5 }}
+            />
           </TouchableOpacity>
         </View>
         <View
@@ -172,7 +167,7 @@ export default function FreezeCategories({
               }}
             >
               <Image
-                source={require("../images/ProductImage/Coffee/iconcoffeecategories.jpg")}
+                source={require("../images/ProductImage/Freeze/FREEZE.png")}
                 style={{ width: 250, height: 250, borderRadius: 10 }}
               />
             </View>
@@ -185,7 +180,7 @@ export default function FreezeCategories({
                   marginBottom: 5,
                 }}
               >
-                Espresso
+                Matcha
               </Text>
               <Text
                 style={{

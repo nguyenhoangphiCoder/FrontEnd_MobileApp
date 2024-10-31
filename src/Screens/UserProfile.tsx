@@ -4,6 +4,7 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
+  Image,
 } from "react-native";
 import React from "react";
 import { NavigationProp } from "@react-navigation/native";
@@ -31,20 +32,18 @@ export default function UserProfile({ navigation }: UserProfileProps) {
         }}
       >
         <TouchableOpacity
-          style={{
-            height: 35,
-            width: 80,
-            backgroundColor: "#D3C0AB",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 20,
-            margin: 15,
+          onPress={() => {
+            navigation.navigate("Home");
           }}
-          onPress={() => navigation.navigate("Home")}
+          style={{
+            padding: 5,
+            marginRight: 10,
+          }}
         >
-          <Text style={{ fontSize: 16, fontWeight: "bold", color: "#230C02" }}>
-            Back
-          </Text>
+          <Image
+            source={require("../images/vector-back-icon.jpg")}
+            style={{ height: 37, width: 37, borderRadius: 5 }}
+          />
         </TouchableOpacity>
         <View
           style={{ alignItems: "center", justifyContent: "center", flex: 1 }}

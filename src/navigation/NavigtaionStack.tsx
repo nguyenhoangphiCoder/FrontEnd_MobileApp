@@ -13,17 +13,20 @@ import FreezeCategories from "../component/FreezeCategories";
 import UserProfile from "../Screens/UserProfile";
 import UpdateUserProfile from "../component/UpdateUserprofile";
 import Cart from "../component/Cart";
+import Order from "../Screens/Order";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
 const MyDrawer = () => {
+  console.log("MyDrawer được gọi");
   return (
     <Drawer.Navigator
       initialRouteName="Home"
       screenOptions={{ headerShown: false }}
     >
       <Drawer.Screen name="Home" component={Home} />
+      <Drawer.Screen name="Order" component={Order} />
       <Drawer.Screen name="UserProfile" component={UserProfile} />
     </Drawer.Navigator>
   );

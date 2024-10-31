@@ -29,23 +29,18 @@ export default function UpdateUserProfile({
         }}
       >
         <TouchableOpacity
-          style={{
-            height: 30,
-            width: 70,
-            backgroundColor: "#D3C0AB",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 10,
-            margin: 15,
-          }}
           onPress={() => {
             navigation.navigate("UserProfile");
           }}
+          style={{
+            padding: 5,
+            marginRight: 10,
+          }}
         >
-          <Text style={{ fontSize: 15, fontWeight: "bold", color: "#230C02" }}>
-            {" "}
-            Back{" "}
-          </Text>
+          <Image
+            source={require("../images/vector-back-icon.jpg")}
+            style={{ height: 37, width: 37, borderRadius: 5 }}
+          />
         </TouchableOpacity>
         <View
           style={{
