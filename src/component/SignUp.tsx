@@ -3,18 +3,51 @@ import {
   Text,
   View,
   TouchableOpacity,
-  ImageBackground,
-  StyleSheet,
   TextInput,
-  Image,
+  StyleSheet,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { NavigationProp } from "@react-navigation/native";
+import axios, { AxiosError } from "axios";
 
 interface SignUpProps {
   navigation: NavigationProp<any>;
 }
+
+interface ErrorResponse {
+  message: string;
+}
+
 export default function SignUp({ navigation }: SignUpProps) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [phone_number, setPhoneNumber] = useState("");
+  const api = axios.create({
+    baseURL: "http://192.168.1.5:3000", // Địa chỉ API của bạn
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const handleSignUp = async () => {
+    const userData = { name, email, password, phone_number };
+
+    try {
+      const response = await api.post("users/sign-up", userData);
+
+      Alert.alert("Đăng ký thành công", `Chào mừng ${response.data.name}!`);
+      navigation.navigate("Login");
+    } catch (error) {
+      const axiosError = error as AxiosError<ErrorResponse>; // Xác định kiểu của lỗi
+      const errorMessage =
+        axiosError.response?.data?.message ||
+        axiosError.message ||
+        "Đăng ký không thành công";
+      Alert.alert("Lỗi", errorMessage);
+    }
+  };
+
   return (
     <SafeAreaView style={{ backgroundColor: "#EDDCC6", flex: 1 }}>
       <View style={{ flexDirection: "row" }}>
@@ -24,15 +57,6 @@ export default function SignUp({ navigation }: SignUpProps) {
         >
           <Text style={{ fontSize: 20, fontWeight: "900" }}>Back</Text>
         </TouchableOpacity>
-        <Image
-          source={require("../images/Logo1.png")}
-          style={{
-            width: 40,
-            height: 40,
-            marginHorizontal: 270,
-            marginTop: 50,
-          }}
-        />
       </View>
       <View
         style={{
@@ -46,21 +70,38 @@ export default function SignUp({ navigation }: SignUpProps) {
         </Text>
       </View>
       <View style={{ marginHorizontal: 50, marginTop: 80 }}>
-        <TextInput placeholder="Your name" style={styles.input} />
-        <TextInput placeholder="Your Email" style={styles.input} />
+        <TextInput
+          placeholder="Your name"
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+        />
+        <TextInput
+          placeholder="Your Email"
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+        />
         <TextInput
           placeholder="Your password"
           secureTextEntry
           style={styles.input}
+          value={password}
+          onChangeText={setPassword}
         />
-        <TextInput placeholder="Your phone number" style={styles.input} />
+        <TextInput
+          placeholder="Your phone number"
+          style={styles.input}
+          value={phone_number}
+          onChangeText={setPhoneNumber}
+        />
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleSignUp}>
           <View style={styles.button}>
             <Text style={styles.buttonText}>Create an account</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
           <View style={styles.loginButton}>
             <Text style={styles.loginButtonText}>Login</Text>
           </View>

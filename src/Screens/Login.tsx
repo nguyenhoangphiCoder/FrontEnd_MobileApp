@@ -10,18 +10,19 @@ import {
 import React, { useState } from "react";
 import axios from "axios";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type RootDrawerParamList = {
   Home: undefined;
   SignUp: undefined;
-  MyDrawer: undefined;
+  MyDrawer: { user: any }; // Cho phép tham số `user`
 };
 
 interface LoginProps {
   navigation: DrawerNavigationProp<RootDrawerParamList>;
 }
 
-export default function Login({ navigation }: any) {
+export default function Login({ navigation }: LoginProps) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
@@ -41,21 +42,32 @@ export default function Login({ navigation }: any) {
       password: trimmedPassword,
     };
 
-    console.log(data);
-
     try {
-      const response = await api.post("users/sign-in", data);
-
-      // console.log(response.data);
-      // cho nay server tra ra khong dung chuan RESful API
+      const response = await api.post("/users/sign-in", data);
 
       if (response.data) {
-        // khong chay vao day
-        console.log("123445");
         console.log("Đăng nhập thành công");
-        navigation.navigate("MyDrawer"); // Điều hướng đến MyDrawer
+        const userData = response.data.user; // Chỉ lấy thông tin người dùng
+
+        // Kiểm tra và lưu thông tin người dùng
+        if (userData) {
+          await AsyncStorage.setItem("user", JSON.stringify(userData));
+
+          // Kiểm tra địa chỉ
+          if (userData.addresses && userData.addresses.length > 0) {
+            console.log("Addresses:", userData.addresses);
+            await AsyncStorage.setItem(
+              "addresses",
+              JSON.stringify(userData.addresses)
+            ); // Lưu địa chỉ
+          }
+
+          // Điều hướng tới màn hình MyDrawer và truyền dữ liệu người dùng
+          navigation.navigate("MyDrawer", { user: userData });
+          console.log(userData);
+        }
       }
-    } catch (error: unknown) {
+    } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         const errorMessage =
           error.response.data.message || "Email hoặc mật khẩu không chính xác.";
@@ -173,7 +185,7 @@ export default function Login({ navigation }: any) {
         }}
       >
         <Text style={{ color: "#230C02", fontSize: 15, fontWeight: "bold" }}>
-          Forgot Your Password
+          Forgot Your Password?
         </Text>
       </TouchableOpacity>
     </SafeAreaView>
