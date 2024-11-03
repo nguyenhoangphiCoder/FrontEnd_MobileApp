@@ -7,8 +7,9 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
+import axios from "axios";
 
 type RootDrawerParamList = {
   Home: undefined;
@@ -25,28 +26,53 @@ interface HomeProps {
   navigation: DrawerNavigationProp<RootDrawerParamList>;
 }
 
-const products = [
-  {
-    id: 1,
-    name: "Espresso",
-    price: "50.000vnd",
-    image: require("../images/ProductImage/Coffee/iconcoffeecategories.jpg"),
-  },
-  {
-    id: 2,
-    name: "Phindi",
-    price: "50.000vnd",
-    image: require("../images/ProductImage/phindi/phindicategories.jpg"),
-  },
-  // Thêm sản phẩm khác ở đây
-];
+interface Product {
+  id: number;
+  name: string;
+  price: string;
+  image: string | null; // Chỉ định rằng image có thể là null
+}
+interface ProductImage {
+  product: { id: number };
+  image_url: string;
+}
 
 export default function Home({ navigation }: HomeProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const productsResponse = await axios.get(
+          "http://192.168.1.5:3000/products"
+        );
+        const productImagesResponse = await axios.get(
+          "http://192.168.1.5:3000/product_images"
+        );
+
+        const productsWithImages = productsResponse.data.map(
+          (product: Product) => {
+            const image = productImagesResponse.data.find(
+              (img: ProductImage) => img.product.id === product.id
+            );
+            return { ...product, image: image ? image.image_url : null };
+          }
+        );
+
+        setProducts(productsWithImages);
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách sản phẩm:", error);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const filteredProducts = searchTerm
+    ? products.filter((product) =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : products;
 
   return (
     <SafeAreaView
@@ -107,7 +133,6 @@ export default function Home({ navigation }: HomeProps) {
         </TouchableOpacity>
       </View>
       <ScrollView>
-        {/* coffee card */}
         <View
           style={{
             backgroundColor: "#EDDCC6",
@@ -162,9 +187,9 @@ export default function Home({ navigation }: HomeProps) {
             />
           </View>
         </View>
-        {/* categories */}
+        {/* Categories */}
         <View style={{ height: 100, backgroundColor: "#230C02" }}>
-          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View
               style={{
                 flexDirection: "row",
@@ -214,17 +239,15 @@ export default function Home({ navigation }: HomeProps) {
                 onPress={() => navigation.navigate("PhindiCategories")}
                 style={{ alignItems: "center", justifyContent: "center" }}
               >
-                <View>
-                  <Image
-                    source={require("../images/ProductImage/phindi/phindicategories.jpg")}
-                    style={{
-                      height: 60,
-                      width: 60,
-                      borderRadius: 20,
-                      marginLeft: 20,
-                    }}
-                  />
-                </View>
+                <Image
+                  source={require("../images/ProductImage/phindi/phindicategories.jpg")}
+                  style={{
+                    height: 60,
+                    width: 60,
+                    borderRadius: 20,
+                    marginLeft: 20,
+                  }}
+                />
                 <Text
                   style={{ marginLeft: 16, fontWeight: "bold", color: "#FFF" }}
                 >
@@ -281,7 +304,7 @@ export default function Home({ navigation }: HomeProps) {
         </View>
         {/* Promotion */}
         <View style={{ backgroundColor: "gray", height: 200 }}>
-          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View
               style={{
                 flexDirection: "row",
@@ -328,7 +351,7 @@ export default function Home({ navigation }: HomeProps) {
             </View>
           </ScrollView>
         </View>
-        <View style={{ backgroundColor: "#230C02" }}>
+        <View style={{ backgroundColor: "#230C02", marginBottom: 20 }}>
           <View>
             <Text
               style={{
@@ -343,44 +366,61 @@ export default function Home({ navigation }: HomeProps) {
             </Text>
           </View>
           <View
-            style={{ marginTop: 10, marginLeft: 30, flexDirection: "column" }}
+            style={{
+              marginTop: 10,
+              flexDirection: "row",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <View style={{ flexDirection: "row" }}>
-              {filteredProducts.map((product) => (
-                <TouchableOpacity
-                  key={product.id}
-                  style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: 10,
-                    margin: 10,
-                  }}
-                >
+            {filteredProducts.map((product) => (
+              <TouchableOpacity
+                key={product.id}
+                style={{
+                  backgroundColor: "#EDDCC6",
+                  height: 200,
+                  width: 150,
+                  borderRadius: 10,
+                  marginLeft: 20,
+                  marginTop: 10,
+                  alignItems: "center",
+                }}
+              >
+                {product.image ? (
                   <Image
-                    source={product.image}
-                    style={{ width: 150, height: 150 }}
+                    source={{ uri: product.image }}
+                    style={{
+                      width: 120,
+                      height: 120,
+                      borderRadius: 10,
+                      marginTop: 10,
+                    }}
                   />
-                  <Text
+                ) : (
+                  <View
                     style={{
-                      color: "#230C02",
-                      fontSize: 13,
-                      fontWeight: "bold",
+                      width: 120,
+                      height: 90,
+                      borderRadius: 10,
+                      backgroundColor: "#D3C0AB",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    {product.name}
-                  </Text>
-                  <Text
-                    style={{
-                      color: "#230C02",
-                      fontSize: 10,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {product.price}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+                    <Text>No Image</Text>
+                  </View>
+                )}
+                <Text
+                  style={{ marginTop: 5, fontSize: 16, fontWeight: "bold" }}
+                >
+                  {product.name}
+                </Text>
+                <Text style={{ color: "#ED9A36", fontSize: 14 }}>
+                  ₫ {product.price}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
       </ScrollView>
