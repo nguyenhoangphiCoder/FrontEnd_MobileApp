@@ -7,8 +7,17 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
+import { FlatList } from "react-native-gesture-handler";
+import axios from "axios";
+
+interface Product {
+  id: number;
+  name: string;
+  price: string;
+  image: string;
+}
 
 type RootDrawerParamList = {
   Home: undefined;
@@ -25,28 +34,59 @@ interface HomeProps {
   navigation: DrawerNavigationProp<RootDrawerParamList>;
 }
 
-const products = [
-  {
-    id: 1,
-    name: "Espresso",
-    price: "50.000vnd",
-    image: require("../images/ProductImage/Coffee/iconcoffeecategories.jpg"),
-  },
-  {
-    id: 2,
-    name: "Phindi",
-    price: "50.000vnd",
-    image: require("../images/ProductImage/phindi/phindicategories.jpg"),
-  },
-  // Thêm sản phẩm khác ở đây
-];
-
 export default function Home({ navigation }: HomeProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get<Product[]>(
+          "http://192.168.1.5:3000/products"
+        );
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const renderProduct = ({ item }: { item: Product }) => (
+    <TouchableOpacity
+      key={item.id}
+      style={{
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: 10,
+        margin: 10,
+      }}
+    >
+      <Image source={{ uri: item.image }} style={{ width: 150, height: 150 }} />
+      <Text style={{ color: "#230C02", fontSize: 13, fontWeight: "bold" }}>
+        {item.name}
+      </Text>
+      <Text style={{ color: "#230C02", fontSize: 10, fontWeight: "bold" }}>
+        {item.price}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView
@@ -106,8 +146,8 @@ export default function Home({ navigation }: HomeProps) {
           />
         </TouchableOpacity>
       </View>
+
       <ScrollView>
-        {/* coffee card */}
         <View
           style={{
             backgroundColor: "#EDDCC6",
@@ -162,7 +202,7 @@ export default function Home({ navigation }: HomeProps) {
             />
           </View>
         </View>
-        {/* categories */}
+
         <View style={{ height: 100, backgroundColor: "#230C02" }}>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             <View
@@ -211,27 +251,6 @@ export default function Home({ navigation }: HomeProps) {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => navigation.navigate("PhindiCategories")}
-                style={{ alignItems: "center", justifyContent: "center" }}
-              >
-                <View>
-                  <Image
-                    source={require("../images/ProductImage/phindi/phindicategories.jpg")}
-                    style={{
-                      height: 60,
-                      width: 60,
-                      borderRadius: 20,
-                      marginLeft: 20,
-                    }}
-                  />
-                </View>
-                <Text
-                  style={{ marginLeft: 16, fontWeight: "bold", color: "#FFF" }}
-                >
-                  PHINDI
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
                 onPress={() => navigation.navigate("TeaCategories")}
                 style={{ alignItems: "center", justifyContent: "center" }}
               >
@@ -251,25 +270,37 @@ export default function Home({ navigation }: HomeProps) {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => navigation.navigate("FreezeCategories")}
+                onPress={() => navigation.navigate("PhindiCategories")}
                 style={{ alignItems: "center", justifyContent: "center" }}
               >
-                <View
+                {/* <Image
+                  source={require("../images/ProductImage/Phindi/iconphindicategories.jpg")}
                   style={{
-                    backgroundColor: "#fff",
                     height: 60,
                     width: 60,
                     borderRadius: 20,
-                    alignItems: "center",
-                    justifyContent: "center",
                     marginLeft: 20,
                   }}
+                /> */}
+                <Text
+                  style={{ marginLeft: 16, fontWeight: "bold", color: "#FFF" }}
                 >
-                  <Image
-                    source={require("../images/ProductImage/Freeze/FREEZE.png")}
-                    style={{ height: 60, width: 60 }}
-                  />
-                </View>
+                  PHIN ĐI
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("FreezeCategories")}
+                style={{ alignItems: "center", justifyContent: "center" }}
+              >
+                <Image
+                  source={require("../images/ProductImage/Freeze/iconfreezecategories.jpg")}
+                  style={{
+                    height: 60,
+                    width: 60,
+                    borderRadius: 20,
+                    marginLeft: 20,
+                  }}
+                />
                 <Text
                   style={{ marginLeft: 16, fontWeight: "bold", color: "#FFF" }}
                 >
@@ -279,110 +310,15 @@ export default function Home({ navigation }: HomeProps) {
             </View>
           </ScrollView>
         </View>
-        {/* Promotion */}
-        <View style={{ backgroundColor: "gray", height: 200 }}>
-          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: 5,
-                }}
-              >
-                <Image
-                  source={require("../images/Promotion1.jpg")}
-                  style={{ width: 380, height: 170 }}
-                />
-              </View>
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: 5,
-                }}
-              >
-                <Image
-                  source={require("../images/Promotion2.jpg")}
-                  style={{ width: 380, height: 170 }}
-                />
-              </View>
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: 5,
-                }}
-              >
-                <Image
-                  source={require("../images/Promotion4.jpg")}
-                  style={{ width: 380, height: 170 }}
-                />
-              </View>
-            </View>
-          </ScrollView>
-        </View>
-        <View style={{ backgroundColor: "#230C02" }}>
-          <View>
-            <Text
-              style={{
-                fontSize: 20,
-                marginTop: 20,
-                color: "#fff",
-                marginLeft: 20,
-                fontWeight: "bold",
-              }}
-            >
-              All
-            </Text>
-          </View>
-          <View
-            style={{ marginTop: 10, marginLeft: 30, flexDirection: "column" }}
-          >
-            <View style={{ flexDirection: "row" }}>
-              {filteredProducts.map((product) => (
-                <TouchableOpacity
-                  key={product.id}
-                  style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: 10,
-                    margin: 10,
-                  }}
-                >
-                  <Image
-                    source={product.image}
-                    style={{ width: 150, height: 150 }}
-                  />
-                  <Text
-                    style={{
-                      color: "#230C02",
-                      fontSize: 13,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {product.name}
-                  </Text>
-                  <Text
-                    style={{
-                      color: "#230C02",
-                      fontSize: 10,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {product.price}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        </View>
+
+        {/* danh sách sản phẩm */}
+        <FlatList
+          data={filteredProducts} // Sử dụng danh sách đã lọc
+          renderItem={renderProduct}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{ paddingBottom: 20, marginLeft: 30 }} // Thêm khoảng cách cho FlatList
+          numColumns={2} // Hiển thị 2 sản phẩm trên một hàng
+        />
       </ScrollView>
     </SafeAreaView>
   );

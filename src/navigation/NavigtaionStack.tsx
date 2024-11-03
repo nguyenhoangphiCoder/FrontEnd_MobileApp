@@ -15,6 +15,7 @@ import FreezeCategories from "../component/FreezeCategories";
 
 import Cart from "../component/Cart";
 import UpdateUserProfile from "../component/UpdateUserprofile";
+import SetAddress from "../component/SetAddress";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -52,6 +53,8 @@ const NavigationStack = () => {
         <Stack.Screen name="FreezeCategories" component={FreezeCategories} />
         <Stack.Screen name="Cart" component={Cart} />
         <Stack.Screen name="UpdateUserProfile" component={UpdateUserProfile} />
+        <Stack.Screen name="SetAddress" component={SetAddress} />
+
         <Stack.Screen name="MyDrawer" component={MyDrawer} />
       </Stack.Navigator>
     </NavigationContainer>

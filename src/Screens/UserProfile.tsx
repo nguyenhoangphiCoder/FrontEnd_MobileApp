@@ -4,6 +4,7 @@ import {
   View,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { NavigationProp } from "@react-navigation/native";
@@ -31,29 +32,32 @@ interface Address {
 export default function UserProfile({ navigation }: UserProfileProps) {
   const [user, setUser] = useState<User | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const handleLogout = async () => {
     try {
+      const token = await AsyncStorage.getItem("token"); // Lấy token nếu cần
       const response = await fetch("http://192.168.1.5:3000/users/sign-out", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Thêm Authorization nếu cần thiết
+          Authorization: `Bearer ${token}`, // Nếu cần gửi token
         },
-        credentials: "include", // Nếu bạn sử dụng cookie
       });
 
       if (response.ok) {
-        // Xóa thông tin người dùng từ AsyncStorage
+        // Xóa thông tin người dùng và địa chỉ
         await AsyncStorage.removeItem("user");
         await AsyncStorage.removeItem("addresses");
-        // Chuyển hướng về màn hình đăng nhập hoặc màn hình chính
         navigation.navigate("Login");
       } else {
-        console.error("Error logging out:", response.status);
-        // Xử lý thông báo lỗi ở đây nếu cần
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || "Logout failed.");
       }
     } catch (error) {
       console.error("Error logging out:", error);
+      setErrorMessage("Logout failed due to an error.");
     }
   };
 
@@ -62,6 +66,9 @@ export default function UserProfile({ navigation }: UserProfileProps) {
       try {
         const userData = await AsyncStorage.getItem("user");
         const addressesData = await AsyncStorage.getItem("addresses");
+
+        console.log("User data:", userData);
+        console.log("Addresses data:", addressesData);
 
         if (userData) {
           const parsedUser: User = JSON.parse(userData);
@@ -74,12 +81,26 @@ export default function UserProfile({ navigation }: UserProfileProps) {
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
+    // Fetch user data when component mounts
     fetchUser();
-  }, []);
 
+    // Add listener to fetch data again when the screen is focused
+    const unsubscribe = navigation.addListener("focus", () => {
+      fetchUser();
+    });
+
+    // Cleanup listener on unmount
+    return unsubscribe;
+  }, [navigation]);
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: "#EDDCC6", marginTop: 30 }}
@@ -231,6 +252,23 @@ export default function UserProfile({ navigation }: UserProfileProps) {
               : "No addresses found."}
           </Text>
         </View>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("SetAddress");
+          }}
+          style={{
+            backgroundColor: "#230C02",
+            alignItems: "center",
+            marginVertical: 10,
+            height: 60,
+            borderRadius: 20,
+            justifyContent: "center",
+          }}
+        >
+          <Text style={{ fontSize: 20, fontWeight: "bold", color: "#fff" }}>
+            Update address
+          </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={{
