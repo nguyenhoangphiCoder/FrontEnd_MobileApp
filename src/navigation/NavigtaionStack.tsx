@@ -7,15 +7,12 @@ import Home from "../Screens/Home";
 import Order from "../Screens/Order";
 import UserProfile from "../Screens/UserProfile";
 import SignUp from "../component/SignUp";
-import CoffeeCategories from "../component/CoffeeCategories";
-import TeaCategories from "../component/TeaCategories";
-import PhindiCategories from "../component/PhindiCategories";
-import MilkTeaCategories from "../component/MilkteaCategories";
-import FreezeCategories from "../component/FreezeCategories";
+import CoffeeCategories from "../component/CategoriesDetail";
 
 import Cart from "../component/Cart";
 import UpdateUserProfile from "../component/UpdateUserprofile";
 import SetAddress from "../component/SetAddress";
+import CategoryProductsScreen from "../component/CategoriesDetail";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -34,10 +31,6 @@ const MyDrawer = () => {
 };
 
 const NavigationStack = () => {
-  // binh thuong khong chia nhu vay, phai chia thanh 2 router va dung store de chuyen huong giua login va khong login
-  // go lai email di em
-  //Phi@gmail.com
-
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -46,15 +39,13 @@ const NavigationStack = () => {
       >
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="SignUp" component={SignUp} />
-        <Stack.Screen name="CoffeeCategories" component={CoffeeCategories} />
-        <Stack.Screen name="TeaCategories" component={TeaCategories} />
-        <Stack.Screen name="MilkteaCategories" component={MilkTeaCategories} />
-        <Stack.Screen name="PhindiCategories" component={PhindiCategories} />
-        <Stack.Screen name="FreezeCategories" component={FreezeCategories} />
+        <Stack.Screen
+          name="CategoriesDetail"
+          component={CategoryProductsScreen}
+        />
         <Stack.Screen name="Cart" component={Cart} />
         <Stack.Screen name="UpdateUserProfile" component={UpdateUserProfile} />
         <Stack.Screen name="SetAddress" component={SetAddress} />
-
         <Stack.Screen name="MyDrawer" component={MyDrawer} />
       </Stack.Navigator>
     </NavigationContainer>

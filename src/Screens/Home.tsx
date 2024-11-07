@@ -14,11 +14,11 @@ import axios from "axios";
 type RootDrawerParamList = {
   Home: undefined;
   Order: undefined;
-  CoffeeCategories: undefined;
+  CategoriesDetail: { category_id: number };
   Cart: undefined;
   TeaCategories: undefined;
   PhindiCategories: undefined;
-  MilkteaCategories: undefined;
+  MilkTeaCategories: undefined;
   FreezeCategories: undefined;
 };
 
@@ -30,16 +30,24 @@ interface Product {
   id: number;
   name: string;
   price: string;
-  image: string | null; // Chỉ định rằng image có thể là null
+  image: string | null;
 }
+
 interface ProductImage {
   product: { id: number };
   image_url: string;
 }
 
+interface Category {
+  id: number;
+  name: string;
+  route: keyof RootDrawerParamList;
+}
+
 export default function Home({ navigation }: HomeProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -50,7 +58,10 @@ export default function Home({ navigation }: HomeProps) {
         const productImagesResponse = await axios.get(
           "http://192.168.1.5:3000/product_images"
         );
-
+        const categoriesResponse = await axios.get(
+          "http://192.168.1.5:3000/categories"
+        );
+        console.log(`id danh muc : ${categoriesResponse}`);
         const productsWithImages = productsResponse.data.map(
           (product: Product) => {
             const image = productImagesResponse.data.find(
@@ -59,6 +70,19 @@ export default function Home({ navigation }: HomeProps) {
             return { ...product, image: image ? image.image_url : null };
           }
         );
+
+        // Cập nhật danh sách danh mục với thuộc tính route
+        const loadedCategories = categoriesResponse.data.map(
+          (category: Category) => ({
+            ...category,
+            route: `${category.name
+              .charAt(0)
+              .toUpperCase()}${category.name.slice(1)}Categories`, // Tạo route dựa trên name
+          })
+        );
+
+        setCategories(loadedCategories);
+        console.log("Loaded categories:", loadedCategories);
 
         setProducts(productsWithImages);
       } catch (error) {
@@ -188,120 +212,54 @@ export default function Home({ navigation }: HomeProps) {
           </View>
         </View>
         {/* Categories */}
-        <View style={{ height: 100, backgroundColor: "#230C02" }}>
+
+        <View
+          style={{
+            height: 100,
+            backgroundColor: "#230C02",
+            paddingVertical: 10,
+          }}
+        >
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => navigation.navigate("CoffeeCategories")}
-                style={{ alignItems: "center", justifyContent: "center" }}
-              >
-                <Image
-                  source={require("../images/ProductImage/Coffee/iconcoffeecategories.jpg")}
-                  style={{
-                    height: 60,
-                    width: 60,
-                    borderRadius: 20,
-                    marginLeft: 20,
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              {categories.map((category) => (
+                <TouchableOpacity
+                  key={category.id}
+                  onPress={() => {
+                    console.log(
+                      `Navigating to category with id: ${category.id}`
+                    );
+                    // Chuyển hướng và truyền category_id
+                    navigation.navigate("CategoriesDetail", {
+                      category_id: category.id,
+                    });
                   }}
-                />
-                <Text
-                  style={{ marginLeft: 16, fontWeight: "bold", color: "#FFF" }}
-                >
-                  COFFEE
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("MilkteaCategories")}
-                style={{ alignItems: "center", justifyContent: "center" }}
-              >
-                <Image
-                  source={require("../images/ProductImage/milk tea/milkteacategories.jpg")}
                   style={{
-                    height: 60,
-                    width: 60,
-                    borderRadius: 20,
-                    marginLeft: 20,
-                  }}
-                />
-                <Text
-                  style={{ marginLeft: 16, fontWeight: "bold", color: "#FFF" }}
-                >
-                  MILK TEA
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("PhindiCategories")}
-                style={{ alignItems: "center", justifyContent: "center" }}
-              >
-                <Image
-                  source={require("../images/ProductImage/phindi/phindicategories.jpg")}
-                  style={{
-                    height: 60,
-                    width: 60,
-                    borderRadius: 20,
-                    marginLeft: 20,
-                  }}
-                />
-                <Text
-                  style={{ marginLeft: 16, fontWeight: "bold", color: "#FFF" }}
-                >
-                  PHINDI
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("TeaCategories")}
-                style={{ alignItems: "center", justifyContent: "center" }}
-              >
-                <Image
-                  source={require("../images/ProductImage/Tea/iconteacategories.jpg")}
-                  style={{
-                    height: 60,
-                    width: 60,
-                    borderRadius: 20,
-                    marginLeft: 20,
-                  }}
-                />
-                <Text
-                  style={{ marginLeft: 16, fontWeight: "bold", color: "#FFF" }}
-                >
-                  TEA
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("FreezeCategories")}
-                style={{ alignItems: "center", justifyContent: "center" }}
-              >
-                <View
-                  style={{
-                    backgroundColor: "#fff",
-                    height: 60,
-                    width: 60,
-                    borderRadius: 20,
                     alignItems: "center",
                     justifyContent: "center",
-                    marginLeft: 20,
+                    height: 75,
+                    width: 80,
+                    backgroundColor: "#EDDCC6",
+                    borderRadius: 10,
+                    marginHorizontal: 10,
                   }}
                 >
-                  <Image
-                    source={require("../images/ProductImage/Freeze/FREEZE.png")}
-                    style={{ height: 60, width: 60 }}
-                  />
-                </View>
-                <Text
-                  style={{ marginLeft: 16, fontWeight: "bold", color: "#FFF" }}
-                >
-                  FREEZE
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      color: "#230C02",
+                      textAlign: "center",
+                      fontSize: 15,
+                    }}
+                  >
+                    {category.name} {/* Hiển thị tên danh mục từ dữ liệu */}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </ScrollView>
         </View>
+
         {/* Promotion */}
         <View style={{ backgroundColor: "gray", height: 200 }}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -365,63 +323,44 @@ export default function Home({ navigation }: HomeProps) {
               All
             </Text>
           </View>
-          <View
-            style={{
-              marginTop: 10,
-              flexDirection: "row",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {filteredProducts.map((product) => (
-              <TouchableOpacity
-                key={product.id}
+          {filteredProducts.map((product) => (
+            <TouchableOpacity
+              key={product.id}
+              style={{
+                backgroundColor: "#EDDCC6",
+                borderRadius: 10,
+                width: "45%",
+                margin: 10,
+                padding: 10,
+              }}
+              // onPress={() => {
+              //   navigation.navigate("CoffeeCategories", {
+              //     category_id: product.id, // Truyền ID danh mục vào màn hình chi tiết sản phẩm
+              //   });
+              // }}
+            >
+              <Image
+                source={
+                  product.image
+                    ? { uri: product.image }
+                    : require("../images/ProductImage/Coffee/iconcoffeecategories.jpg")
+                }
+                style={{ width: "100%", height: 100, borderRadius: 10 }}
+              />
+              <Text
                 style={{
-                  backgroundColor: "#EDDCC6",
-                  height: 200,
-                  width: 150,
-                  borderRadius: 10,
-                  marginLeft: 20,
-                  marginTop: 10,
-                  alignItems: "center",
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  marginTop: 5,
                 }}
               >
-                {product.image ? (
-                  <Image
-                    source={{ uri: product.image }}
-                    style={{
-                      width: 120,
-                      height: 120,
-                      borderRadius: 10,
-                      marginTop: 10,
-                    }}
-                  />
-                ) : (
-                  <View
-                    style={{
-                      width: 120,
-                      height: 90,
-                      borderRadius: 10,
-                      backgroundColor: "#D3C0AB",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text>No Image</Text>
-                  </View>
-                )}
-                <Text
-                  style={{ marginTop: 5, fontSize: 16, fontWeight: "bold" }}
-                >
-                  {product.name}
-                </Text>
-                <Text style={{ color: "#ED9A36", fontSize: 14 }}>
-                  ₫ {product.price}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+                {product.name}
+              </Text>
+              <Text style={{ fontSize: 14, color: "green" }}>
+                {product.price}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </ScrollView>
     </SafeAreaView>
