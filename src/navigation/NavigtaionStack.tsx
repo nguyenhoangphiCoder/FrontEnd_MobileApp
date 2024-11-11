@@ -13,6 +13,7 @@ import Cart from "../component/Cart";
 import UpdateUserProfile from "../component/UpdateUserprofile";
 import SetAddress from "../component/SetAddress";
 import CategoryProductsScreen from "../component/CategoriesDetail";
+import ProductDetail from "../component/ProductDetail";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -43,6 +44,7 @@ const NavigationStack = () => {
           name="CategoriesDetail"
           component={CategoryProductsScreen}
         />
+        <Stack.Screen name="ProductDetail" component={ProductDetail} />
         <Stack.Screen name="Cart" component={Cart} />
         <Stack.Screen name="UpdateUserProfile" component={UpdateUserProfile} />
         <Stack.Screen name="SetAddress" component={SetAddress} />

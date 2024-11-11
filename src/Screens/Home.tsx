@@ -6,6 +6,8 @@ import {
   Image,
   TextInput,
   ScrollView,
+  Animated,
+  Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
@@ -20,6 +22,7 @@ type RootDrawerParamList = {
   PhindiCategories: undefined;
   MilkTeaCategories: undefined;
   FreezeCategories: undefined;
+  ProductDetail: { id: number };
 };
 
 interface HomeProps {
@@ -31,6 +34,7 @@ interface Product {
   name: string;
   price: string;
   image: string | null;
+  description: string;
 }
 
 interface ProductImage {
@@ -49,17 +53,22 @@ export default function Home({ navigation }: HomeProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
+  // Animated values
+  const scrollX = new Animated.Value(0);
+
+  const { width } = Dimensions.get("window");
   useEffect(() => {
     async function fetchData() {
       try {
         const productsResponse = await axios.get(
-          "http://192.168.1.5:3000/products"
+          "http://192.168.1.3:3000/products"
         );
         const productImagesResponse = await axios.get(
-          "http://192.168.1.5:3000/product_images"
+          "http://192.168.1.3:3000/product_images"
         );
+        console.log(productImagesResponse);
         const categoriesResponse = await axios.get(
-          "http://192.168.1.5:3000/categories"
+          "http://192.168.1.3:3000/categories"
         );
         console.log(`id danh muc : ${categoriesResponse}`);
         const productsWithImages = productsResponse.data.map(
@@ -97,7 +106,11 @@ export default function Home({ navigation }: HomeProps) {
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : products;
-
+  const promotionImages = [
+    require("../images/Promotion1.jpg"),
+    require("../images/Promotion2.jpg"),
+    require("../images/Promotion4.jpg"),
+  ];
   return (
     <SafeAreaView
       style={{ backgroundColor: "#230C02", flex: 1, marginTop: 30 }}
@@ -262,52 +275,33 @@ export default function Home({ navigation }: HomeProps) {
 
         {/* Promotion */}
         <View style={{ backgroundColor: "gray", height: 200 }}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
+          <Animated.ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ flexDirection: "row" }}
+            pagingEnabled
+            scrollEventThrottle={16}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+              { useNativeDriver: false }
+            )}
+          >
+            {promotionImages.map((image, index) => (
               <View
+                key={index}
                 style={{
+                  width,
                   alignItems: "center",
                   justifyContent: "center",
-                  margin: 5,
                 }}
               >
                 <Image
-                  source={require("../images/Promotion1.jpg")}
-                  style={{ width: 380, height: 170 }}
+                  source={image}
+                  style={{ width: width - 30, height: 170, borderRadius: 10 }}
                 />
               </View>
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: 5,
-                }}
-              >
-                <Image
-                  source={require("../images/Promotion2.jpg")}
-                  style={{ width: 380, height: 170 }}
-                />
-              </View>
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: 5,
-                }}
-              >
-                <Image
-                  source={require("../images/Promotion4.jpg")}
-                  style={{ width: 380, height: 170 }}
-                />
-              </View>
-            </View>
-          </ScrollView>
+            ))}
+          </Animated.ScrollView>
         </View>
         <View style={{ backgroundColor: "#230C02", marginBottom: 20 }}>
           <View>
@@ -323,44 +317,70 @@ export default function Home({ navigation }: HomeProps) {
               All
             </Text>
           </View>
-          {filteredProducts.map((product) => (
-            <TouchableOpacity
-              key={product.id}
-              style={{
-                backgroundColor: "#EDDCC6",
-                borderRadius: 10,
-                width: "45%",
-                margin: 10,
-                padding: 10,
-              }}
-              // onPress={() => {
-              //   navigation.navigate("CoffeeCategories", {
-              //     category_id: product.id, // Truyền ID danh mục vào màn hình chi tiết sản phẩm
-              //   });
-              // }}
-            >
-              <Image
-                source={
-                  product.image
-                    ? { uri: product.image }
-                    : require("../images/ProductImage/Coffee/iconcoffeecategories.jpg")
-                }
-                style={{ width: "100%", height: 100, borderRadius: 10 }}
-              />
-              <Text
+          <View style={{ alignItems: "center", justifyContent: "center" }}>
+            {filteredProducts.map((product) => (
+              <TouchableOpacity
+                key={product.id}
                 style={{
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  marginTop: 5,
+                  backgroundColor: "#fff",
+                  borderRadius: 10,
+                  width: "90%",
+                  height: 100,
+                  margin: 10,
+                  padding: 10,
+                  flexDirection: "row",
+                  borderWidth: 1,
+                }}
+                onPress={() => {
+                  navigation.navigate("ProductDetail", {
+                    id: product.id, // Truyền ID danh mục vào màn hình chi tiết sản phẩm
+                  });
                 }}
               >
-                {product.name}
-              </Text>
-              <Text style={{ fontSize: 14, color: "green" }}>
-                {product.price}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Image
+                  source={
+                    product.image
+                      ? { uri: product.image }
+                      : require("../images/ProductImage/Coffee/iconcoffeecategories.jpg")
+                  }
+                  style={{ width: 80, height: 80, borderRadius: 10 }}
+                />
+                <View style={{ marginHorizontal: 20 }}>
+                  <View style={{ flexDirection: "row" }}>
+                    <View style={{ width: 150 }}>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          fontWeight: "bold",
+                          marginTop: 5,
+                        }}
+                      >
+                        {product.name}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginLeft: 20,
+                        marginTop: 5,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {product.price}$
+                    </Text>
+                  </View>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      marginTop: 5,
+                    }}
+                  >
+                    {product.description}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

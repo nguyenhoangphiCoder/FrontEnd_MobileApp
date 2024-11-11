@@ -27,7 +27,7 @@ export default function Login({ navigation }: LoginProps) {
   const [password, setPassword] = useState<string>("223322");
 
   const api = axios.create({
-    baseURL: "http://192.168.1.5:3000", // Địa chỉ API của bạn
+    baseURL: "http://192.168.1.3:3000", // Địa chỉ API của bạn
     headers: {
       "Content-Type": "application/json",
     },
@@ -44,6 +44,7 @@ export default function Login({ navigation }: LoginProps) {
 
     try {
       const response = await api.post("/users/sign-in", data);
+      console.log(response);
 
       if (response.data) {
         console.log("Đăng nhập thành công");
@@ -68,10 +69,18 @@ export default function Login({ navigation }: LoginProps) {
         }
       }
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        const errorMessage =
-          error.response.data.message || "Email hoặc mật khẩu không chính xác.";
-        Alert.alert("Lỗi", errorMessage);
+      if (axios.isAxiosError(error)) {
+        if (error.message === "Network Error") {
+          Alert.alert(
+            "Lỗi",
+            "Không thể kết nối tới server. Vui lòng kiểm tra kết nối mạng."
+          );
+        } else if (error.response) {
+          const errorMessage =
+            error.response.data.message ||
+            "Email hoặc mật khẩu không chính xác.";
+          Alert.alert("Lỗi", errorMessage);
+        }
       } else {
         Alert.alert("Lỗi", "Không thể đăng nhập. Vui lòng thử lại.");
       }

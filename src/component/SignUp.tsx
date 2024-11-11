@@ -25,7 +25,7 @@ export default function SignUp({ navigation }: SignUpProps) {
   const [password, setPassword] = useState("");
   const [phone_number, setPhoneNumber] = useState("");
   const api = axios.create({
-    baseURL: "http://192.168.1.5:3000", // Địa chỉ API của bạn
+    baseURL: "http://192.168.1.3:3000", // Địa chỉ API của bạn
     headers: {
       "Content-Type": "application/json",
     },

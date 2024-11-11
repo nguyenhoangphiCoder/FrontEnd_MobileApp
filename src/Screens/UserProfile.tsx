@@ -38,7 +38,7 @@ export default function UserProfile({ navigation }: UserProfileProps) {
   const handleLogout = async () => {
     try {
       const token = await AsyncStorage.getItem("token"); // Lấy token nếu cần
-      const response = await fetch("http://192.168.1.5:3000/users/sign-out", {
+      const response = await fetch("http://192.168.1.3:3000/users/sign-out", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

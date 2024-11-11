@@ -50,7 +50,7 @@ export default function UpdateUserProfile({
 
     try {
       const response = await axios.patch(
-        `http://192.168.1.5:3000/users/${id}`,
+        `http://192.168.1.3:3000/users/${id}`,
         { name, email, phone_number, avatar },
         { headers: { Authorization: `Bearer ${token}` } }
       );
