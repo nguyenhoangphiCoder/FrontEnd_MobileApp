@@ -4,12 +4,12 @@ import {
   View,
   TouchableOpacity,
   TextInput,
-  StyleSheet,
   Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { NavigationProp } from "@react-navigation/native";
 import axios, { AxiosError } from "axios";
+import { API_BASE_URL } from "../../ip_API";
 
 interface SignUpProps {
   navigation: NavigationProp<any>;
@@ -25,7 +25,7 @@ export default function SignUp({ navigation }: SignUpProps) {
   const [password, setPassword] = useState("");
   const [phone_number, setPhoneNumber] = useState("");
   const api = axios.create({
-    baseURL: "http://192.168.10.58:3000", // Địa chỉ API của bạn
+    baseURL: `${API_BASE_URL}`, // Địa chỉ API của bạn
     headers: {
       "Content-Type": "application/json",
     },
@@ -35,11 +35,10 @@ export default function SignUp({ navigation }: SignUpProps) {
 
     try {
       const response = await api.post("users/sign-up", userData);
-
       Alert.alert("Đăng ký thành công", `Chào mừng ${response.data.name}!`);
       navigation.navigate("Login");
     } catch (error) {
-      const axiosError = error as AxiosError<ErrorResponse>; // Xác định kiểu của lỗi
+      const axiosError = error as AxiosError<ErrorResponse>;
       const errorMessage =
         axiosError.response?.data?.message ||
         axiosError.message ||
@@ -49,102 +48,132 @@ export default function SignUp({ navigation }: SignUpProps) {
   };
 
   return (
-    <SafeAreaView style={{ backgroundColor: "#EDDCC6", flex: 1 }}>
-      <View style={{ flexDirection: "row" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F5F3" }}>
+      <View style={{ flexDirection: "row", marginTop: 40, marginLeft: 20 }}>
         <TouchableOpacity
-          onPress={() => navigation.navigate("Login")}
-          style={{ marginTop: 55, marginLeft: 20 }}
+          onPress={() => navigation.goBack()}
+          style={{ padding: 10 }}
         >
-          <Text style={{ fontSize: 20, fontWeight: "900" }}>Back</Text>
+          <Text style={{ fontSize: 18, color: "#230C02", fontWeight: "bold" }}>
+            Back
+          </Text>
         </TouchableOpacity>
       </View>
+
       <View
         style={{
-          marginTop: 50,
           justifyContent: "center",
           alignItems: "center",
+          marginTop: 40,
         }}
       >
-        <Text style={{ fontSize: 30, fontWeight: "900", color: "#230C02" }}>
+        <Text style={{ fontSize: 28, fontWeight: "bold", color: "#230C02" }}>
           Create your account!
         </Text>
       </View>
-      <View style={{ marginHorizontal: 50, marginTop: 80 }}>
+
+      <View style={{ marginHorizontal: 30, marginTop: 50 }}>
         <TextInput
           placeholder="Your name"
-          style={styles.input}
+          style={{
+            height: 50,
+            borderRadius: 10,
+            borderColor: "#230C02",
+            borderWidth: 1,
+            paddingLeft: 15,
+            fontSize: 16,
+            marginBottom: 20,
+            backgroundColor: "#FFF",
+          }}
           value={name}
           onChangeText={setName}
         />
         <TextInput
           placeholder="Your Email"
-          style={styles.input}
+          style={{
+            height: 50,
+            borderRadius: 10,
+            borderColor: "#230C02",
+            borderWidth: 1,
+            paddingLeft: 15,
+            fontSize: 16,
+            marginBottom: 20,
+            backgroundColor: "#FFF",
+          }}
           value={email}
           onChangeText={setEmail}
         />
         <TextInput
           placeholder="Your password"
           secureTextEntry
-          style={styles.input}
+          style={{
+            height: 50,
+            borderRadius: 10,
+            borderColor: "#230C02",
+            borderWidth: 1,
+            paddingLeft: 15,
+            fontSize: 16,
+            marginBottom: 20,
+            backgroundColor: "#FFF",
+          }}
           value={password}
           onChangeText={setPassword}
         />
         <TextInput
           placeholder="Your phone number"
-          style={styles.input}
+          style={{
+            height: 50,
+            borderRadius: 10,
+            borderColor: "#230C02",
+            borderWidth: 1,
+            paddingLeft: 15,
+            fontSize: 16,
+            marginBottom: 20,
+            backgroundColor: "#FFF",
+          }}
           value={phone_number}
           onChangeText={setPhoneNumber}
         />
 
         <TouchableOpacity onPress={handleSignUp}>
-          <View style={styles.button}>
-            <Text style={styles.buttonText}>Create an account</Text>
+          <View
+            style={{
+              backgroundColor: "#230C02",
+              height: 50,
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 10,
+              marginBottom: 20,
+            }}
+          >
+            <Text
+              style={{ color: "#EDDCC6", fontSize: 18, fontWeight: "bold" }}
+            >
+              Create an account
+            </Text>
           </View>
         </TouchableOpacity>
+
         <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-          <View style={styles.loginButton}>
-            <Text style={styles.loginButtonText}>Login</Text>
+          <View
+            style={{
+              height: 50,
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 10,
+              borderWidth: 1,
+              borderColor: "#230C02",
+              backgroundColor: "#FFF",
+            }}
+          >
+            <Text
+              style={{ color: "#230C02", fontSize: 16, fontWeight: "bold" }}
+            >
+              Already have an account? Log in
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  input: {
-    height: 45,
-    borderRadius: 20,
-    borderColor: "#230C02",
-    borderWidth: 1,
-    padding: 10,
-    marginBottom: 15,
-  },
-  button: {
-    backgroundColor: "#230C02",
-    marginTop: 30,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 20,
-  },
-  buttonText: {
-    color: "#EDDCC6",
-    fontSize: 15,
-    fontWeight: "bold",
-  },
-  loginButton: {
-    marginTop: 30,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 20,
-    borderColor: "#230C02",
-    borderWidth: 2,
-  },
-  loginButtonText: {
-    color: "#230C02",
-    fontSize: 15,
-    fontWeight: "bold",
-  },
-});

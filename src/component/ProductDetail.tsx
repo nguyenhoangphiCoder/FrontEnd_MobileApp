@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import axios from "axios";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
+import { API_BASE_URL } from "../../ip_API";
 
 // Định nghĩa kiểu cho sản phẩm và kích cỡ
 interface Product {
@@ -69,15 +70,15 @@ export default function ProductDetail({
 
         // Lấy thông tin sản phẩm từ API
         const productResponse = await axios.get(
-          `http://192.168.1.34:3000/products/${id}`
+          `${API_BASE_URL}/products/${id}`
         );
 
         // Lấy hình ảnh của sản phẩm
         const productImagesResponse = await axios.get(
-          "http://192.168.1.34:3000/product_images"
+          `${API_BASE_URL}/product_images`
         );
         const productSizeResponse = await axios.get(
-          "http://192.168.1.34:3000/product_sizes"
+          `${API_BASE_URL}/product_sizes`
         );
 
         // Lấy tất cả các kích cỡ
@@ -133,6 +134,7 @@ export default function ProductDetail({
       setQuantity((prevQuantity) => prevQuantity - 1);
     }
   };
+
   const handleAddToCart = async () => {
     try {
       const fetchCartData = async (userId: number) => {
@@ -142,21 +144,20 @@ export default function ProductDetail({
         }
         let cartId;
         const cartResponse = await axios.get(
-          `http://192.168.1.34:3000/carts?user_id=${userId}`
+          `${API_BASE_URL}/carts?user_id=${userId}`
         );
 
         if (cartResponse.data.length > 0) {
           cartId = cartResponse.data[0].id;
         } else {
-          const newCartResponse = await axios.post(
-            "http://192.168.1.34:3000/carts",
-            { user_id: userId }
-          );
+          const newCartResponse = await axios.post(`${API_BASE_URL}/carts`, {
+            user_id: userId,
+          });
           cartId = newCartResponse.data.id;
         }
 
         // Thêm sản phẩm vào cart_items
-        await axios.post("http://192.168.1.34:3000/cart_items", {
+        await axios.post(`${API_BASE_URL}/cart_items`, {
           product_id: product.id,
           quantity: quantity,
           cart_id: cartId,
@@ -207,156 +208,130 @@ export default function ProductDetail({
         >
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={{ padding: 5, marginRight: 10 }}
+            style={{
+              padding: 10,
+
+              borderRadius: 50,
+            }}
           >
             <Image
               source={require("../images/vector-back-icon.jpg")}
-              style={{ height: 37, width: 37, borderRadius: 5 }}
+              style={{ height: 30, width: 30 }}
             />
           </TouchableOpacity>
         </View>
       </View>
 
-      <View>
-        <View style={{ alignItems: "center" }}>
+      <View style={{ paddingHorizontal: 20 }}>
+        <View style={{ alignItems: "center", marginVertical: 20 }}>
           <Image
             source={{
               uri: product.image || "http://via.placeholder.com/250x250",
             }}
-            style={{ width: "70%", height: 300 }}
+            style={{ width: "80%", height: 300, borderRadius: 10 }}
           />
         </View>
-        <View>
-          <Text
-            style={{
-              fontSize: 30,
-              fontWeight: "bold",
-              marginTop: 20,
-              marginHorizontal: 20,
-            }}
-          >
-            {product.name}
-          </Text>
-          <Text
-            style={{
-              fontSize: 18,
-              color: "#888",
-              marginVertical: 10,
-              marginHorizontal: 20,
-            }}
-            numberOfLines={3}
-          >
-            {product.description}
-          </Text>
 
-          <View style={{ marginTop: 100, marginHorizontal: 20 }}>
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>Size</Text>
-            <View style={{ flexDirection: "row", marginTop: 10 }}>
-              {sizes.map((size) => (
-                <TouchableOpacity
-                  key={size.id}
-                  onPress={() => handleSizeChange(size)}
-                  style={{
-                    backgroundColor:
-                      selectedSize?.id === size.id ? "#EDDCC6" : "#fff",
-                    borderWidth: 1,
-                    padding: 10,
-                    marginHorizontal: 5,
-                    borderRadius: 5,
-                    borderColor: "#ccc",
-                  }}
-                >
-                  <Text>{`${size.size} (+${Math.floor(
-                    size.price_adjustment
-                  )} $)`}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
+        <Text style={{ fontSize: 28, fontWeight: "bold", marginBottom: 10 }}>
+          {product.name}
+        </Text>
+        <Text
+          style={{
+            fontSize: 16,
+            color: "#230C02",
+            marginBottom: 20,
+            textAlign: "center",
+          }}
+          numberOfLines={3}
+        >
+          {product.description}
+        </Text>
 
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ fontSize: 18, fontWeight: "bold" }}>Select Size</Text>
           <View
             style={{
+              flexDirection: "row",
+              marginTop: 10,
               alignItems: "center",
               justifyContent: "center",
-              marginTop: 50,
             }}
           >
-            <View
-              style={{
-                flexDirection: "row",
-                height: 60,
-                width: "100%",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 20,
-                borderTopWidth: 1,
-                borderColor: "#ccc",
-                paddingHorizontal: 10,
-              }}
-            >
-              <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                {finalPrice} $
-              </Text>
-
-              <View
+            {sizes.map((size) => (
+              <TouchableOpacity
+                key={size.id}
+                onPress={() => handleSizeChange(size)}
                 style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginTop: 1,
+                  backgroundColor:
+                    selectedSize?.id === size.id ? "#Eee" : "#fff",
+                  borderWidth: 2,
+                  padding: 12,
+                  marginHorizontal: 8,
+                  borderRadius: 5,
+                  borderColor: "#230C02",
                 }}
               >
-                <TouchableOpacity
-                  onPress={handleDecreaseQuantity}
-                  style={{
-                    backgroundColor: "#230C02",
-                    width: 40,
-                    height: 40,
-                    borderRadius: 10,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginRight: 15,
-                  }}
-                >
-                  <Text style={{ fontSize: 24, color: "#fff" }}>-</Text>
-                </TouchableOpacity>
-
-                <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                  {quantity}
+                <Text style={{ fontSize: 16 }}>
+                  {`${size.size} (${Math.floor(size.price_adjustment)} $)`}
                 </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
 
-                <TouchableOpacity
-                  onPress={handleIncreaseQuantity}
-                  style={{
-                    backgroundColor: "#230C02",
-                    width: 40,
-                    height: 40,
-                    borderRadius: 10,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginLeft: 15,
-                  }}
-                >
-                  <Text style={{ fontSize: 24, color: "#fff" }}>+</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Text style={{ fontSize: 22, fontWeight: "bold" }}>
+            {finalPrice} $
+          </Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <TouchableOpacity
-              onPress={handleAddToCart}
+              onPress={handleDecreaseQuantity}
               style={{
                 backgroundColor: "#230C02",
-                width: "80%",
-                height: 60,
-                justifyContent: "center",
+                borderRadius: 10,
+                width: 40,
+                height: 40,
                 alignItems: "center",
-                borderRadius: 20,
+                justifyContent: "center",
               }}
             >
-              <Text style={{ fontSize: 18, color: "#fff" }}>Add to Cart</Text>
+              <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>
+                -
+              </Text>
+            </TouchableOpacity>
+            <Text style={{ marginHorizontal: 20, fontSize: 18 }}>
+              {quantity}
+            </Text>
+            <TouchableOpacity
+              onPress={handleIncreaseQuantity}
+              style={{
+                backgroundColor: "#230C02",
+                borderRadius: 10,
+                width: 40,
+                height: 40,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ color: "#fff", fontSize: 18 }}>+</Text>
             </TouchableOpacity>
           </View>
         </View>
+
+        <TouchableOpacity
+          onPress={handleAddToCart}
+          style={{
+            backgroundColor: "#230C02",
+            marginTop: 20,
+            paddingVertical: 12,
+            borderRadius: 10,
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ fontSize: 18, fontWeight: "bold", color: "#fff" }}>
+            Add to Cart
+          </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

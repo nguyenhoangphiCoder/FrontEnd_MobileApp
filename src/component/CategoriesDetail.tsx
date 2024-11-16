@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import axios from "axios";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
+import { API_BASE_URL } from "../../ip_API";
 
 interface Product {
   id: number;
@@ -76,14 +77,14 @@ export default function CategoryProductsScreen({
         const [productsResponse, sizesResponse, productImagesResponse] =
           await Promise.all([
             axios.get(
-              `http://192.168.1.34:3000/product_categories/category/${category_id}`
+              `${API_BASE_URL}/product_categories/category/${category_id}`
             ),
-            axios.get("http://192.168.1.34:3000/product_sizes"),
-            axios.get("http://192.168.1.343000/product_images"),
-            axios.get("http://192.168.1.34:3000/products"),
+            axios.get(`${API_BASE_URL}/product_sizes`),
+            axios.get(`${API_BASE_URL}/product_images`),
+            axios.get(`${API_BASE_URL}/products`),
           ]);
         const categoriesResponse = await axios.get(
-          "http://192.168.1.34:3000/categories"
+          `${API_BASE_URL}/categories`
         );
 
         const productsWithImages = productsResponse.data.map(
@@ -94,20 +95,12 @@ export default function CategoryProductsScreen({
             return { ...product, image: image ? image.image_url : null };
           }
         );
-        const loadedCategories = categoriesResponse.data.map(
-          (category: Category) => ({
-            ...category,
-            route: `${category.name
-              .charAt(0)
-              .toUpperCase()}${category.name.slice(1)}Categories`,
-          })
-        );
 
-        setCategories(loadedCategories);
+        setCategories(categoriesResponse.data);
         setProducts(productsWithImages);
         setSizes(sizesResponse.data);
 
-        const currentCategory = loadedCategories.find(
+        const currentCategory = categoriesResponse.data.find(
           (category: Category) => category.id === category_id
         );
         if (currentCategory) {
@@ -152,7 +145,7 @@ export default function CategoryProductsScreen({
 
   return (
     <SafeAreaView
-      style={{ backgroundColor: "#EDDCC6", flex: 1, paddingTop: 20 }}
+      style={{ backgroundColor: "#F0F0F0", flex: 1, paddingTop: 20 }}
     >
       <View style={{ backgroundColor: "#230C02", paddingBottom: 10 }}>
         <View
@@ -165,11 +158,11 @@ export default function CategoryProductsScreen({
         >
           <TouchableOpacity
             onPress={() => navigation.navigate("Home")}
-            style={{ padding: 5, marginRight: 10 }}
+            style={{ padding: 10 }}
           >
             <Image
               source={require("../images/vector-back-icon.jpg")}
-              style={{ height: 37, width: 37, borderRadius: 5 }}
+              style={{ height: 30, width: 30, borderRadius: 5 }}
             />
           </TouchableOpacity>
           <View
@@ -177,49 +170,39 @@ export default function CategoryProductsScreen({
               flex: 1,
               flexDirection: "row",
               alignItems: "center",
-              borderColor: "#fff",
-              borderWidth: 1,
-              borderRadius: 10,
               backgroundColor: "#fff",
+              borderRadius: 20,
               paddingHorizontal: 10,
             }}
           >
             <TextInput
               value={searchTerm}
               onChangeText={setSearchTerm}
-              placeholder="Search"
-              style={{ flex: 1, height: 40 }}
+              placeholder="Search products..."
+              style={{ flex: 1, height: 40, fontSize: 16 }}
             />
           </View>
           <TouchableOpacity
-            onPress={() => navigation.navigate("Home")}
-            style={{
-              height: 35,
-              width: 35,
-              alignItems: "center",
-              justifyContent: "center",
-              marginLeft: 10,
-            }}
+            onPress={() => navigation.goBack()}
+            style={{ padding: 10 }}
           >
             <Image
               source={require("../images/cart2.jpg")}
-              style={{ height: 40, width: 40, borderRadius: 5 }}
+              style={{ height: 30, width: 30, borderRadius: 5 }}
             />
           </TouchableOpacity>
         </View>
-
-        <View style={{ alignItems: "center", paddingVertical: 10 }}>
-          <Text
-            style={{
-              fontSize: 30,
-              fontStyle: "italic",
-              fontWeight: "900",
-              color: "#FFF",
-            }}
-          >
-            {categoryName}
-          </Text>
-        </View>
+        <Text
+          style={{
+            textAlign: "center",
+            fontSize: 30,
+            fontWeight: "bold",
+            color: "#fff",
+            paddingTop: 10,
+          }}
+        >
+          {categoryName}
+        </Text>
       </View>
 
       <FlatList
@@ -227,19 +210,21 @@ export default function CategoryProductsScreen({
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("ProductDetail", { id: item.id });
-            }}
+            onPress={() =>
+              navigation.navigate("ProductDetail", { id: item.id })
+            }
             style={{
-              marginVertical: 5,
-              backgroundColor: "#FFF",
+              marginVertical: 10,
+              backgroundColor: "#fff",
               flexDirection: "row",
-              padding: 10,
-              borderRadius: 10,
+              padding: 15,
+              borderRadius: 15,
               shadowColor: "#000",
               shadowOpacity: 0.1,
               shadowRadius: 5,
               elevation: 3,
+              alignItems: "center",
+              justifyContent: "space-between",
             }}
           >
             <Image
@@ -250,35 +235,20 @@ export default function CategoryProductsScreen({
                 width: 100,
                 height: 100,
                 borderRadius: 10,
+                marginRight: 15,
               }}
             />
-            <View
-              style={{
-                marginLeft: 15,
-                flex: 1,
-              }}
-            >
-              <View style={{ flexDirection: "row" }}>
-                <View style={{ width: 150 }}>
-                  <Text style={{ fontSize: 18, fontWeight: "600" }}>
-                    {item.name}
-                  </Text>
-                </View>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontWeight: "400",
-                    color: "#000",
-                    marginLeft: 50,
-                  }}
-                >
-                  {adjustedPrices[item.id]} $
-                </Text>
-              </View>
-              <Text style={{ fontSize: 16, color: "#888" }}>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 18, fontWeight: "600" }}>
+                {item.name}
+              </Text>
+              <Text style={{ fontSize: 14, color: "#777" }}>
                 {item.description}
               </Text>
             </View>
+            <Text style={{ fontSize: 18, fontWeight: "600", color: "#FF6347" }}>
+              ${Math.floor(adjustedPrices[item.id])}
+            </Text>
           </TouchableOpacity>
         )}
       />

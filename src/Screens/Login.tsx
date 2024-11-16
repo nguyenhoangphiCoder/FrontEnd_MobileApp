@@ -11,6 +11,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_BASE_URL } from "../../ip_API";
 
 type RootDrawerParamList = {
   Home: undefined;
@@ -27,7 +28,7 @@ export default function Login({ navigation }: LoginProps) {
   const [password, setPassword] = useState<string>("223322");
 
   const api = axios.create({
-    baseURL: "http://192.168.1.34:3000", // Địa chỉ API của bạn
+    baseURL: ` ${API_BASE_URL}`, // Địa chỉ API của bạn
     headers: {
       "Content-Type": "application/json",
     },
@@ -89,9 +90,9 @@ export default function Login({ navigation }: LoginProps) {
   };
 
   return (
-    <SafeAreaView style={{ backgroundColor: "#EDDCC6", flex: 1 }}>
+    <SafeAreaView style={{ backgroundColor: "#eee", flex: 1 }}>
       <Image
-        source={require("../images/Logo1.png")}
+        source={require("../images/logo1.jpg")}
         style={{
           marginTop: 80,
           width: 180,
@@ -165,7 +166,7 @@ export default function Login({ navigation }: LoginProps) {
             borderRadius: 20,
           }}
         >
-          <Text style={{ color: "#EDDCC6", fontSize: 15, fontWeight: "bold" }}>
+          <Text style={{ color: "#fff", fontSize: 15, fontWeight: "bold" }}>
             Login
           </Text>
         </TouchableOpacity>

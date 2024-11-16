@@ -6,12 +6,12 @@ import {
   TextInput,
   Image,
   Alert,
-  StyleSheet,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { NavigationProp } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { API_BASE_URL } from "../../ip_API";
 
 interface UpdateUserProfileProps {
   navigation: NavigationProp<any>;
@@ -50,7 +50,7 @@ export default function UpdateUserProfile({
 
     try {
       const response = await axios.patch(
-        `http://192.168.1.123:3000/users/${id}`,
+        `${API_BASE_URL}/users/${id}`,
         { name, email, phone_number, avatar },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -85,105 +85,142 @@ export default function UpdateUserProfile({
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: "#F6F5F3", // Thay đổi màu nền cho nhẹ nhàng hơn
+        marginTop: 30,
+      }}
+    >
+      <View
+        style={{
+          backgroundColor: "#Fff", // Màu nền header
+          height: 60,
+          flexDirection: "row",
+          alignItems: "center",
+          paddingHorizontal: 15,
+          borderBottomWidth: 1,
+          borderBottomColor: "#fff", // Màu viền dưới
+        }}
+      >
         <TouchableOpacity
           onPress={() => navigation.navigate("UserProfile")}
-          style={styles.backButton}
+          style={{ padding: 10 }}
         >
           <Image
             source={require("../images/vector-back-icon.jpg")}
-            style={styles.backIcon}
+            style={{ height: 25, width: 25 }}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Update Account</Text>
+        <Text
+          style={{
+            fontSize: 22,
+            fontWeight: "bold",
+            color: "#230C02", // Chỉnh lại màu chữ header
+            marginLeft: 10,
+            textAlign: "center",
+            flex: 1,
+          }}
+        >
+          Update Account
+        </Text>
       </View>
-      <View style={styles.form}>
+      <View
+        style={{
+          marginTop: 20,
+          alignItems: "center",
+          paddingHorizontal: 30,
+        }}
+      >
         <TextInput
           placeholder="Your name"
           value={name}
           onChangeText={setName}
-          style={styles.input}
+          style={{
+            height: 45,
+            borderRadius: 10,
+            backgroundColor: "#FFFFFF", // Màu nền input
+            borderWidth: 1,
+            borderColor: "#230C02", // Màu viền
+            paddingHorizontal: 15,
+            marginBottom: 15,
+            width: "100%",
+            fontSize: 16,
+          }}
         />
         <TextInput
           placeholder="Your Email"
           value={email}
           onChangeText={setEmail}
-          style={styles.input}
+          style={{
+            height: 45,
+            borderRadius: 10,
+            backgroundColor: "#FFFFFF", // Màu nền input
+            borderWidth: 1,
+            borderColor: "#230C02", // Màu viền
+            paddingHorizontal: 15,
+            marginBottom: 15,
+            width: "100%",
+            fontSize: 16,
+          }}
         />
 
         <TextInput
           placeholder="Your phone number"
           value={phone_number}
           onChangeText={setPhone}
-          style={styles.input}
+          style={{
+            height: 45,
+            borderRadius: 10,
+            backgroundColor: "#FFFFFF", // Màu nền input
+            borderWidth: 1,
+            borderColor: "#230C02", // Màu viền
+            paddingHorizontal: 15,
+            marginBottom: 15,
+            width: "100%",
+            fontSize: 16,
+          }}
         />
         <TextInput
           placeholder="Your avatar"
           value={avatar}
           onChangeText={setAvatar}
-          style={styles.input}
+          style={{
+            height: 45,
+            borderRadius: 10,
+            backgroundColor: "#FFFFFF", // Màu nền input
+            borderWidth: 1,
+            borderColor: "#230C02", // Màu viền
+            paddingHorizontal: 15,
+            marginBottom: 15,
+            width: "100%",
+            fontSize: 16,
+          }}
         />
-        <TouchableOpacity onPress={handleUpdateProfile} style={styles.button}>
-          <Text style={styles.buttonText}>Update Profile</Text>
+
+        <TouchableOpacity
+          onPress={handleUpdateProfile}
+          style={{
+            backgroundColor: "#230C02", // Nút bấm màu đậm
+            marginTop: 30,
+            height: 45,
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: 10,
+            width: "100%",
+          }}
+        >
+          <Text
+            style={{
+              color: "#EDDCC6", // Màu chữ của nút
+              fontSize: 18,
+              fontWeight: "bold",
+            }}
+          >
+            Update Profile
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#D3C0AB",
-    marginTop: 30,
-  },
-  header: {
-    backgroundColor: "#EDDCC6",
-    height: 50,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  backButton: {
-    padding: 5,
-    marginRight: 10,
-  },
-  backIcon: {
-    height: 37,
-    width: 37,
-    borderRadius: 5,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    width: 205,
-    textAlign: "center",
-  },
-  form: {
-    marginTop: 100,
-    alignItems: "center",
-  },
-  input: {
-    height: 45,
-    borderRadius: 20,
-    backgroundColor: "#EDDCC6",
-    borderWidth: 1,
-    padding: 10,
-    marginBottom: 15,
-    width: 350,
-  },
-  button: {
-    backgroundColor: "#EDDCC6",
-    marginTop: 30,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 20,
-    width: 200,
-  },
-  buttonText: {
-    color: "#230C02",
-    fontSize: 15,
-    fontWeight: "bold",
-  },
-});

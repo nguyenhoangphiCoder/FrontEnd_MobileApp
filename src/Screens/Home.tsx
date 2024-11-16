@@ -12,8 +12,8 @@ import {
 } from "react-native";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import axios from "axios";
+import { API_BASE_URL } from "../../ip_API";
 
-// Định nghĩa các type cho navigation
 type RootDrawerParamList = {
   Home: undefined;
   Order: undefined;
@@ -30,11 +30,10 @@ interface HomeProps {
   navigation: DrawerNavigationProp<RootDrawerParamList>;
 }
 
-// Định nghĩa type cho sản phẩm, hình ảnh sản phẩm và danh mục
 interface Product {
   id: number;
   name: string;
-  price: string;
+  price: number;
   image: string | null;
   description: string;
 }
@@ -51,23 +50,20 @@ interface Category {
 }
 
 export default function Home({ navigation }: HomeProps) {
-  // Khai báo các state
-  const [searchTerm, setSearchTerm] = useState(""); // Từ khóa tìm kiếm
-  const [products, setProducts] = useState<Product[]>([]); // Danh sách sản phẩm
-  const [categories, setCategories] = useState<Category[]>([]); // Danh sách danh mục
-  const [cart, setCart] = useState<any>(null); // Giỏ hàng
+  const [searchTerm, setSearchTerm] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [cart, setCart] = useState<any>(null);
 
-  // Khai báo các giá trị animation
   const scrollX = new Animated.Value(0);
-  const { width } = Dimensions.get("window"); // Lấy kích thước màn hình
+  const { width } = Dimensions.get("window");
 
-  // Hàm lấy dữ liệu giỏ hàng từ API
-  const fetchCartData = async (userId: number) => {
+  const fetchCartData = async (user_id: number) => {
     try {
       const response = await axios.get(
-        `http://192.168.1.34:3000/carts?user_id=${userId}`
+        `${API_BASE_URL}/carts?user_id=${user_id}`
       );
-      setCart(response.data); // Cập nhật giỏ hàng
+      setCart(response.data);
     } catch (error) {
       console.error("Lỗi khi tải giỏ hàng:", error);
     }
@@ -76,18 +72,14 @@ export default function Home({ navigation }: HomeProps) {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Lấy dữ liệu sản phẩm, hình ảnh và danh mục từ API
-        const productsResponse = await axios.get(
-          "http://192.168.1.34:3000/products"
-        );
+        const productsResponse = await axios.get(`${API_BASE_URL}/products`);
         const productImagesResponse = await axios.get(
-          "http://192.168.1.34:3000/product_images"
+          `${API_BASE_URL}/product_images`
         );
         const categoriesResponse = await axios.get(
-          "http://192.168.1.34:3000/categories"
+          `${API_BASE_URL}/categories`
         );
 
-        // Kết hợp sản phẩm với hình ảnh
         const productsWithImages = productsResponse.data.map(
           (product: Product) => {
             const image = productImagesResponse.data.find(
@@ -97,36 +89,31 @@ export default function Home({ navigation }: HomeProps) {
           }
         );
 
-        // Cập nhật danh sách danh mục với thuộc tính route
         const loadedCategories = categoriesResponse.data.map(
           (category: Category) => ({
             ...category,
             route: `${category.name
               .charAt(0)
-              .toUpperCase()}${category.name.slice(1)}Categories`, // Tạo route từ tên danh mục
+              .toUpperCase()}${category.name.slice(1)}Categories`,
           })
         );
 
         setCategories(loadedCategories);
         setProducts(productsWithImages);
-
-        // Gọi API lấy giỏ hàng cho user_id = 14
         fetchCartData(14); // Ví dụ: user_id = 14
       } catch (error) {
         console.error("Lỗi khi tải danh sách sản phẩm:", error);
       }
     }
     fetchData();
-  }, []); // Chạy một lần khi component được mount
+  }, []);
 
-  // Lọc sản phẩm theo từ khóa tìm kiếm
   const filteredProducts = searchTerm
     ? products.filter((product) =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : products;
 
-  // Dữ liệu hình ảnh khuyến mãi
   const promotionImages = [
     require("../images/Promotion1.jpg"),
     require("../images/Promotion2.jpg"),
@@ -134,67 +121,62 @@ export default function Home({ navigation }: HomeProps) {
   ];
 
   return (
-    <SafeAreaView
-      style={{ backgroundColor: "#230C02", flex: 1, marginTop: 30 }}
-    >
+    <SafeAreaView style={{ backgroundColor: "#eee", flex: 1, marginTop: 20 }}>
       <View
-        style={{ backgroundColor: "#230C02", height: 60, flexDirection: "row" }}
+        style={{
+          backgroundColor: "#eee",
+          height: 100,
+          flexDirection: "row",
+          alignItems: "center",
+        }}
       >
-        <TouchableOpacity onPress={() => navigation.openDrawer()}>
-          <View
-            style={{
-              backgroundColor: "#fff",
-              marginTop: 17,
-              borderRadius: 5,
-              marginLeft: 10,
-            }}
-          >
-            <Image
-              source={require("../images/mobile.png")}
-              style={{ height: 30, width: 30 }}
-            />
-          </View>
+        <TouchableOpacity
+          onPress={() => navigation.openDrawer()}
+          style={{ marginLeft: 10 }}
+        >
+          <Image
+            source={require("../images/mobile.png")}
+            style={{ height: 35, width: 35, borderRadius: 5 }}
+          />
         </TouchableOpacity>
         <View
           style={{
+            marginLeft: 15,
+            width: 280,
+            height: 40,
+            borderWidth: 2,
             borderRadius: 10,
-            borderColor: "#fff",
-            borderWidth: 1,
-            width: 290,
-            marginLeft: 10,
-            marginTop: 15,
-            marginBottom: 10,
-            backgroundColor: "#fff",
           }}
         >
           <TextInput
             placeholder="Search"
-            style={{ height: 30, paddingHorizontal: 15, width: 290 }}
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: 15,
+              paddingHorizontal: 10,
+              height: 35,
+              fontSize: 15,
+            }}
             value={searchTerm}
             onChangeText={setSearchTerm}
           />
         </View>
         <TouchableOpacity
-          style={{
-            height: 35,
-            width: 35,
-            alignItems: "center",
-            justifyContent: "center",
-            marginVertical: 15,
-            marginHorizontal: 15,
-          }}
           onPress={() => navigation.navigate("Cart", { cart })}
+          style={{ marginRight: 10 }}
         >
           <Image
-            source={require("../images/cart2.jpg")}
-            style={{ height: 35, width: 35, borderRadius: 5 }}
+            source={require("../images/cart.png")}
+            style={{ height: 40, width: 40, borderRadius: 5, marginLeft: 10 }}
           />
         </TouchableOpacity>
       </View>
-      <ScrollView>
+
+      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+        {/* Banner */}
         <View
           style={{
-            backgroundColor: "#EDDCC6",
+            backgroundColor: "#EEE",
             height: 200,
             alignItems: "center",
             justifyContent: "center",
@@ -209,98 +191,78 @@ export default function Home({ navigation }: HomeProps) {
               flexDirection: "row",
             }}
           >
-            <View style={{ flexDirection: "column" }}>
-              <Text
-                style={{
-                  color: "#fff",
-                  marginTop: 50,
-                  marginLeft: 25,
-                  fontSize: 15,
-                  fontWeight: "700",
-                }}
-              >
+            <View
+              style={{
+                flexDirection: "column",
+                justifyContent: "center",
+                marginLeft: 25,
+              }}
+            >
+              <Text style={{ color: "#fff", fontSize: 18, fontWeight: "700" }}>
                 THE TECH COFFEE
               </Text>
               <Text
-                style={{
-                  color: "#fff",
-                  marginTop: 5,
-                  marginLeft: 10,
-                  fontSize: 10,
-                  fontStyle: "italic",
-                }}
+                style={{ color: "#fff", fontSize: 12, fontStyle: "italic" }}
               >
                 "Powered by Code, Fueled by Coffee."
               </Text>
             </View>
             <Image
-              source={require("../images/Logo1.png")}
+              source={require("../images/logo1.jpg")}
               style={{
-                width: 135,
-                height: 130,
-                marginTop: 30,
-                marginLeft: 20,
+                width: 100,
+                height: 100,
+                marginTop: 50,
                 borderRadius: 20,
-                backgroundColor: "#D3C0AB",
+                marginHorizontal: 20,
               }}
             />
           </View>
         </View>
-        {/* Categories */}
 
-        <View
-          style={{
-            height: 100,
-            backgroundColor: "#230C02",
-            paddingVertical: 10,
-          }}
-        >
+        {/* Categories */}
+        <View style={{ backgroundColor: "#fff", paddingVertical: 10 }}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              {categories.map((category) => (
-                <TouchableOpacity
-                  key={category.id}
-                  onPress={() => {
-                    console.log(
-                      `Navigating to category with id: ${category.id}`
-                    );
-                    // Chuyển hướng và truyền category_id
-                    navigation.navigate("CategoriesDetail", {
-                      category_id: category.id,
-                    });
-                  }}
+            {categories.map((category) => (
+              <TouchableOpacity
+                key={category.id}
+                onPress={() =>
+                  navigation.navigate("CategoriesDetail", {
+                    category_id: category.id,
+                  })
+                }
+                style={{
+                  backgroundColor: "#Eee",
+                  borderRadius: 20,
+                  marginHorizontal: 10,
+                  height: 50,
+                  width: 90,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  padding: 10,
+                  borderWidth: 2,
+                }}
+              >
+                <Text
                   style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: 75,
-                    width: 80,
-                    backgroundColor: "#EDDCC6",
-                    borderRadius: 10,
-                    marginHorizontal: 10,
+                    color: "#230C02",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    fontSize: 16,
                   }}
                 >
-                  <Text
-                    style={{
-                      fontWeight: "bold",
-                      color: "#230C02",
-                      textAlign: "center",
-                      fontSize: 15,
-                    }}
-                  >
-                    {category.name} {/* Hiển thị tên danh mục từ dữ liệu */}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+                  {category.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </ScrollView>
         </View>
 
-        {/* Promotion */}
-        <View style={{ backgroundColor: "gray", height: 200 }}>
+        {/* Promotions */}
+        <View style={{ backgroundColor: "#eee", height: 200 }}>
           <Animated.ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={{ flexDirection: "row" }}
             pagingEnabled
             scrollEventThrottle={16}
             onScroll={Animated.event(
@@ -313,8 +275,8 @@ export default function Home({ navigation }: HomeProps) {
                 key={index}
                 style={{
                   width,
-                  alignItems: "center",
                   justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
                 <Image
@@ -325,84 +287,67 @@ export default function Home({ navigation }: HomeProps) {
             ))}
           </Animated.ScrollView>
         </View>
-        <View style={{ backgroundColor: "#230C02", marginBottom: 20 }}>
-          <View>
-            <Text
-              style={{
-                fontSize: 20,
-                marginTop: 20,
-                color: "#fff",
-                marginLeft: 20,
-                fontWeight: "bold",
-              }}
-            >
-              All
-            </Text>
-          </View>
-          <View style={{ alignItems: "center", justifyContent: "center" }}>
+
+        {/* Products */}
+        <View style={{ backgroundColor: "#eee", marginBottom: 20 }}>
+          <Text
+            style={{
+              fontSize: 22,
+              fontWeight: "bold",
+              color: "#230C02",
+              marginHorizontal: 15,
+              marginBottom: 10,
+            }}
+          >
+            All Products
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          >
             {filteredProducts.map((product) => (
               <TouchableOpacity
                 key={product.id}
+                onPress={() =>
+                  navigation.navigate("ProductDetail", { id: product.id })
+                }
                 style={{
-                  backgroundColor: "#fff",
-                  borderRadius: 10,
-                  width: "90%",
-                  height: 100,
-                  margin: 10,
-                  padding: 10,
-                  flexDirection: "row",
-                  borderWidth: 1,
-                }}
-                onPress={() => {
-                  navigation.navigate("ProductDetail", {
-                    id: product.id, // Truyền ID danh mục vào màn hình chi tiết sản phẩm
-                  });
+                  marginRight: 15,
+                  width: 150,
+                  alignItems: "center",
+                  marginBottom: 20,
                 }}
               >
                 <Image
-                  source={
-                    product.image
-                      ? { uri: product.image }
-                      : require("../images/ProductImage/Coffee/iconcoffeecategories.jpg")
-                  }
-                  style={{ width: 80, height: 80, borderRadius: 10 }}
+                  source={{
+                    uri: product.image || "http://via.placeholder.com/250x250",
+                  }}
+                  style={{
+                    width: 120,
+                    height: 120,
+                    borderRadius: 15,
+                    marginBottom: 5,
+
+                    borderWidth: 2,
+                  }}
                 />
-                <View style={{ marginHorizontal: 20 }}>
-                  <View style={{ flexDirection: "row" }}>
-                    <View style={{ width: 150 }}>
-                      <Text
-                        style={{
-                          fontSize: 15,
-                          fontWeight: "bold",
-                          marginTop: 5,
-                        }}
-                      >
-                        {product.name}
-                      </Text>
-                    </View>
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        marginLeft: 20,
-                        marginTop: 5,
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {product.price}$
-                    </Text>
-                  </View>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      marginTop: 5,
-                    }}
-                  >
-                    {product.description}
-                  </Text>
-                </View>
+                <Text
+                  style={{
+                    color: "#230C02",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    fontSize: 14,
+                  }}
+                >
+                  {product.name}
+                </Text>
+                <Text style={{ textAlign: "center" }}>
+                  {product.price.toLocaleString()} $
+                </Text>
               </TouchableOpacity>
             ))}
-          </View>
+          </ScrollView>
         </View>
       </ScrollView>
     </SafeAreaView>

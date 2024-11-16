@@ -11,6 +11,7 @@ import React, { useState, useEffect } from "react";
 import { NavigationProp } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { API_BASE_URL } from "../../ip_API";
 
 interface SetAddressProps {
   navigation: NavigationProp<any>;
@@ -62,7 +63,7 @@ export default function SetAddress({ navigation }: SetAddressProps) {
 
     try {
       const response = await axios.put(
-        `http://192.168.1.34:3000/addresses/${address_id}`,
+        `${API_BASE_URL}/addresses/${address_id}`,
         { address_line, country, city },
         { headers: { Authorization: `Bearer ${token}` } }
       );

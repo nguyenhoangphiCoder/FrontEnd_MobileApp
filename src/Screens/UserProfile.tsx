@@ -9,6 +9,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { NavigationProp } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_BASE_URL } from "../../ip_API";
 
 interface UserProfileProps {
   navigation: NavigationProp<any>;
@@ -38,7 +39,7 @@ export default function UserProfile({ navigation }: UserProfileProps) {
   const handleLogout = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const response = await fetch("http://192.168.1.34:3000/users/sign-out", {
+      const response = await fetch(`${API_BASE_URL}/users/sign-out`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -88,19 +89,41 @@ export default function UserProfile({ navigation }: UserProfileProps) {
     return unsubscribe;
   }, [navigation]);
 
-  const defaultAvatar = "http://192.168.1.34:3000/default-avatar.jpg";
+  const fetchAvatar = async (id: number) => {
+    try {
+      console.log("Fetching avatar for user with ID:", id);
+      const response = await fetch(`${API_BASE_URL}/users/${id}/avatar`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Avatar data:", data); // Kiểm tra dữ liệu avatar nhận được
+        setUser((prevUser) => ({
+          ...prevUser!,
+          avatar_url: data.avatar_url,
+        }));
+      } else {
+        throw new Error(`Failed to fetch avatar: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Error fetching avatar:", error);
+      setErrorMessage("Failed to load avatar. Please check your network.");
+    }
+  };
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchAvatar(user.id);
+    }
+  }, [user?.id]);
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: "#EDDCC6", marginTop: 30 }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff", marginTop: 30 }}>
       <View
         style={{
-          backgroundColor: "#EDDCC6",
+          backgroundColor: "#fff",
           height: 60,
           flexDirection: "row",
           alignItems: "center",
@@ -120,9 +143,7 @@ export default function UserProfile({ navigation }: UserProfileProps) {
             style={{ height: 37, width: 37, borderRadius: 5 }}
           />
         </TouchableOpacity>
-        <View
-          style={{ alignItems: "center", justifyContent: "center", flex: 1 }}
-        >
+        <View style={{}}>
           <Text style={{ fontSize: 24, fontWeight: "bold", color: "#230C02" }}>
             Account
           </Text>
@@ -137,22 +158,23 @@ export default function UserProfile({ navigation }: UserProfileProps) {
         }}
       >
         <Image
-          source={{ uri: user?.avatar_url || defaultAvatar }}
+          source={{
+            uri: user?.avatar_url || `no avatar`,
+          }}
           style={{
-            height: 150,
-            width: 150,
-            borderRadius: 75,
-            borderWidth: 4,
-            borderColor: "#230C02",
+            height: 200,
+            width: 200,
+            borderRadius: 100,
+
             backgroundColor: "#FFEB3B",
           }}
           onError={() => {
+            console.log("Error loading avatar, using default avatar");
             setUser((prevUser) => ({
               ...prevUser!,
-              avatar_url: defaultAvatar,
+              avatar_url: `no avatar`, // default avatar URL
             }));
           }}
-          onLoad={() => console.log("Avatar image loaded successfully")}
         />
 
         <View
@@ -166,10 +188,11 @@ export default function UserProfile({ navigation }: UserProfileProps) {
               marginLeft: 15,
               height: 35,
               width: 90,
-              backgroundColor: "#D3C0AB",
+              backgroundColor: "#eee",
               borderRadius: 20,
               alignItems: "center",
               justifyContent: "center",
+              borderWidth: 2,
             }}
             onPress={() => navigation.navigate("UpdateUserProfile")}
           >
@@ -180,27 +203,20 @@ export default function UserProfile({ navigation }: UserProfileProps) {
 
       <View
         style={{
-          backgroundColor: "#D3C0AB",
-          borderTopRightRadius: 50,
-          borderTopLeftRadius: 50,
+          backgroundColor: "#fff",
           paddingVertical: 20,
           marginTop: 40,
           paddingHorizontal: 20,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 5,
-          elevation: 5,
         }}
       >
         <View
           style={{
-            backgroundColor: "#EDDCC6",
             justifyContent: "center",
             marginVertical: 10,
             height: 60,
             borderRadius: 20,
             paddingHorizontal: 15,
+            borderWidth: 1,
           }}
         >
           <Text style={{ fontSize: 15, fontWeight: "bold", color: "#230C02" }}>
@@ -209,7 +225,7 @@ export default function UserProfile({ navigation }: UserProfileProps) {
         </View>
         <View
           style={{
-            backgroundColor: "#EDDCC6",
+            borderWidth: 1,
             justifyContent: "center",
             marginVertical: 10,
             height: 60,
@@ -225,7 +241,7 @@ export default function UserProfile({ navigation }: UserProfileProps) {
         {/* Hiển thị địa chỉ */}
         <View
           style={{
-            backgroundColor: "#EDDCC6",
+            borderWidth: 1,
             justifyContent: "center",
             marginVertical: 10,
             height: 60,
