@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   SafeAreaView,
   Text,
@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import axios from "axios";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
-import { Picker } from "@react-native-picker/picker";
 
 interface Product {
   id: number;
@@ -68,6 +67,7 @@ export default function CategoryProductsScreen({
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryName, setCategoryName] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchProductsAndSizes = async () => {
@@ -76,14 +76,14 @@ export default function CategoryProductsScreen({
         const [productsResponse, sizesResponse, productImagesResponse] =
           await Promise.all([
             axios.get(
-              `http://192.168.1.3:3000/product_categories/category/${category_id}`
+              `http://192.168.1.34:3000/product_categories/category/${category_id}`
             ),
-            axios.get("http://192.168.1.3:3000/product_sizes"),
-            axios.get("http://192.168.1.3:3000/product_images"),
-            axios.get("http://192.168.1.3:3000/products"),
+            axios.get("http://192.168.1.34:3000/product_sizes"),
+            axios.get("http://192.168.1.343000/product_images"),
+            axios.get("http://192.168.1.34:3000/products"),
           ]);
         const categoriesResponse = await axios.get(
-          "http://192.168.1.3:3000/categories"
+          "http://192.168.1.34:3000/categories"
         );
 
         const productsWithImages = productsResponse.data.map(
@@ -139,6 +139,13 @@ export default function CategoryProductsScreen({
     setAdjustedPrices(newPrices);
   }, [selectedSize, products, sizes]);
 
+  const filteredProducts = useMemo(() => {
+    if (!searchTerm) return products;
+    return products.filter((product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [searchTerm, products]);
+
   if (loading) {
     return <Text>Loading...</Text>;
   }
@@ -177,7 +184,12 @@ export default function CategoryProductsScreen({
               paddingHorizontal: 10,
             }}
           >
-            <TextInput placeholder="Search" style={{ flex: 1, height: 40 }} />
+            <TextInput
+              value={searchTerm}
+              onChangeText={setSearchTerm}
+              placeholder="Search"
+              style={{ flex: 1, height: 40 }}
+            />
           </View>
           <TouchableOpacity
             onPress={() => navigation.navigate("Home")}
@@ -211,7 +223,7 @@ export default function CategoryProductsScreen({
       </View>
 
       <FlatList
-        data={products}
+        data={filteredProducts}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity

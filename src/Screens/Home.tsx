@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   SafeAreaView,
   Text,
@@ -9,15 +10,15 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
-import React, { useEffect, useState } from "react";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import axios from "axios";
 
+// Định nghĩa các type cho navigation
 type RootDrawerParamList = {
   Home: undefined;
   Order: undefined;
   CategoriesDetail: { category_id: number };
-  Cart: undefined;
+  Cart: { cart: any };
   TeaCategories: undefined;
   PhindiCategories: undefined;
   MilkTeaCategories: undefined;
@@ -29,6 +30,7 @@ interface HomeProps {
   navigation: DrawerNavigationProp<RootDrawerParamList>;
 }
 
+// Định nghĩa type cho sản phẩm, hình ảnh sản phẩm và danh mục
 interface Product {
   id: number;
   name: string;
@@ -49,28 +51,43 @@ interface Category {
 }
 
 export default function Home({ navigation }: HomeProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  // Khai báo các state
+  const [searchTerm, setSearchTerm] = useState(""); // Từ khóa tìm kiếm
+  const [products, setProducts] = useState<Product[]>([]); // Danh sách sản phẩm
+  const [categories, setCategories] = useState<Category[]>([]); // Danh sách danh mục
+  const [cart, setCart] = useState<any>(null); // Giỏ hàng
 
-  // Animated values
+  // Khai báo các giá trị animation
   const scrollX = new Animated.Value(0);
+  const { width } = Dimensions.get("window"); // Lấy kích thước màn hình
 
-  const { width } = Dimensions.get("window");
+  // Hàm lấy dữ liệu giỏ hàng từ API
+  const fetchCartData = async (userId: number) => {
+    try {
+      const response = await axios.get(
+        `http://192.168.1.34:3000/carts?user_id=${userId}`
+      );
+      setCart(response.data); // Cập nhật giỏ hàng
+    } catch (error) {
+      console.error("Lỗi khi tải giỏ hàng:", error);
+    }
+  };
+
   useEffect(() => {
     async function fetchData() {
       try {
+        // Lấy dữ liệu sản phẩm, hình ảnh và danh mục từ API
         const productsResponse = await axios.get(
-          "http://192.168.1.3:3000/products"
+          "http://192.168.1.34:3000/products"
         );
         const productImagesResponse = await axios.get(
-          "http://192.168.1.3:3000/product_images"
+          "http://192.168.1.34:3000/product_images"
         );
-        console.log(productImagesResponse);
         const categoriesResponse = await axios.get(
-          "http://192.168.1.3:3000/categories"
+          "http://192.168.1.34:3000/categories"
         );
-        console.log(`id danh muc : ${categoriesResponse}`);
+
+        // Kết hợp sản phẩm với hình ảnh
         const productsWithImages = productsResponse.data.map(
           (product: Product) => {
             const image = productImagesResponse.data.find(
@@ -86,31 +103,36 @@ export default function Home({ navigation }: HomeProps) {
             ...category,
             route: `${category.name
               .charAt(0)
-              .toUpperCase()}${category.name.slice(1)}Categories`, // Tạo route dựa trên name
+              .toUpperCase()}${category.name.slice(1)}Categories`, // Tạo route từ tên danh mục
           })
         );
 
         setCategories(loadedCategories);
-        console.log("Loaded categories:", loadedCategories);
-
         setProducts(productsWithImages);
+
+        // Gọi API lấy giỏ hàng cho user_id = 14
+        fetchCartData(14); // Ví dụ: user_id = 14
       } catch (error) {
         console.error("Lỗi khi tải danh sách sản phẩm:", error);
       }
     }
     fetchData();
-  }, []);
+  }, []); // Chạy một lần khi component được mount
 
+  // Lọc sản phẩm theo từ khóa tìm kiếm
   const filteredProducts = searchTerm
     ? products.filter((product) =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : products;
+
+  // Dữ liệu hình ảnh khuyến mãi
   const promotionImages = [
     require("../images/Promotion1.jpg"),
     require("../images/Promotion2.jpg"),
     require("../images/Promotion4.jpg"),
   ];
+
   return (
     <SafeAreaView
       style={{ backgroundColor: "#230C02", flex: 1, marginTop: 30 }}
@@ -161,7 +183,7 @@ export default function Home({ navigation }: HomeProps) {
             marginVertical: 15,
             marginHorizontal: 15,
           }}
-          onPress={() => navigation.navigate("Cart")}
+          onPress={() => navigation.navigate("Cart", { cart })}
         >
           <Image
             source={require("../images/cart2.jpg")}

@@ -37,17 +37,16 @@ export default function UserProfile({ navigation }: UserProfileProps) {
 
   const handleLogout = async () => {
     try {
-      const token = await AsyncStorage.getItem("token"); // Lấy token nếu cần
-      const response = await fetch("http://192.168.1.3:3000/users/sign-out", {
+      const token = await AsyncStorage.getItem("token");
+      const response = await fetch("http://192.168.1.34:3000/users/sign-out", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Nếu cần gửi token
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (response.ok) {
-        // Xóa thông tin người dùng và địa chỉ
         await AsyncStorage.removeItem("user");
         await AsyncStorage.removeItem("addresses");
         navigation.navigate("Login");
@@ -67,9 +66,6 @@ export default function UserProfile({ navigation }: UserProfileProps) {
         const userData = await AsyncStorage.getItem("user");
         const addressesData = await AsyncStorage.getItem("addresses");
 
-        console.log("User data:", userData);
-        console.log("Addresses data:", addressesData);
-
         if (userData) {
           const parsedUser: User = JSON.parse(userData);
           setUser(parsedUser);
@@ -86,21 +82,18 @@ export default function UserProfile({ navigation }: UserProfileProps) {
       }
     };
 
-    // Fetch user data when component mounts
     fetchUser();
+    const unsubscribe = navigation.addListener("focus", fetchUser);
 
-    // Add listener to fetch data again when the screen is focused
-    const unsubscribe = navigation.addListener("focus", () => {
-      fetchUser();
-    });
-
-    // Cleanup listener on unmount
     return unsubscribe;
   }, [navigation]);
+
+  const defaultAvatar = "http://192.168.1.34:3000/default-avatar.jpg";
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
+
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: "#EDDCC6", marginTop: 30 }}
@@ -144,9 +137,7 @@ export default function UserProfile({ navigation }: UserProfileProps) {
         }}
       >
         <Image
-          source={{
-            uri: user?.avatar_url || "https://example.com/default-avatar.jpg",
-          }}
+          source={{ uri: user?.avatar_url || defaultAvatar }}
           style={{
             height: 150,
             width: 150,
@@ -156,9 +147,14 @@ export default function UserProfile({ navigation }: UserProfileProps) {
             backgroundColor: "#FFEB3B",
           }}
           onError={() => {
-            console.log("Error loading image, using default avatar.");
+            setUser((prevUser) => ({
+              ...prevUser!,
+              avatar_url: defaultAvatar,
+            }));
           }}
+          onLoad={() => console.log("Avatar image loaded successfully")}
         />
+
         <View
           style={{ flexDirection: "row", alignItems: "center", marginTop: 10 }}
         >
@@ -252,6 +248,7 @@ export default function UserProfile({ navigation }: UserProfileProps) {
               : "No addresses found."}
           </Text>
         </View>
+
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("SetAddress");

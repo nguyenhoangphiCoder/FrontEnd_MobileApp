@@ -62,7 +62,7 @@ export default function SetAddress({ navigation }: SetAddressProps) {
 
     try {
       const response = await axios.put(
-        `http://192.168.1.3:3000/addresses/${address_id}`,
+        `http://192.168.1.34:3000/addresses/${address_id}`,
         { address_line, country, city },
         { headers: { Authorization: `Bearer ${token}` } }
       );

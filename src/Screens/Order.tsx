@@ -30,14 +30,14 @@ export default function Order({ navigation }: OrderProps) {
       style={{
         flex: 1,
         marginTop: 35,
-        backgroundColor: "#230C02",
+        backgroundColor: "#fff",
       }}
     >
       {/* Header */}
       <View
         style={{
           height: 50,
-          backgroundColor: "#EDDCC6",
+          backgroundColor: "#fff",
           flexDirection: "row",
           alignItems: "center",
           paddingHorizontal: 10,
@@ -102,33 +102,25 @@ export default function Order({ navigation }: OrderProps) {
               </Text>
               <Text style={{ fontSize: 16, color: "#444" }}>Size: Large</Text>
               <Text style={{ fontSize: 16, color: "#444" }}>Quantity: x2</Text>
-              <Text style={{ fontSize: 14, color: "#888", marginTop: 5 }}>
-                Note: No sugar
-              </Text>
+            </View>
+            <View
+              style={{
+                alignItems: "flex-end",
+              }}
+            >
+              <View
+                style={{
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ fontSize: 15, fontWeight: "bold" }}>
+                  50000 VND
+                </Text>
+              </View>
             </View>
           </View>
 
           {/* Giá sản phẩm */}
-          <View
-            style={{
-              marginTop: 15,
-              alignItems: "flex-end",
-            }}
-          >
-            <View
-              style={{
-                backgroundColor: "#fff",
-                borderRadius: 20,
-                paddingVertical: 10,
-                paddingHorizontal: 25,
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-                50000 VND
-              </Text>
-            </View>
-          </View>
         </View>
       </ScrollView>
 

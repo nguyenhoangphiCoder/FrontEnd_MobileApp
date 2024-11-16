@@ -27,7 +27,7 @@ export default function Login({ navigation }: LoginProps) {
   const [password, setPassword] = useState<string>("223322");
 
   const api = axios.create({
-    baseURL: "http://192.168.1.3:3000", // Địa chỉ API của bạn
+    baseURL: "http://192.168.1.34:3000", // Địa chỉ API của bạn
     headers: {
       "Content-Type": "application/json",
     },

@@ -38,6 +38,12 @@ type RootDrawerParamList = {
     Product: Product[];
   };
   CategoryProducts: { category_id: number; name: string };
+  Cart: {
+    user_id: number;
+    finalPrice?: number;
+    size: string;
+    adjustment_price_: number;
+  };
 };
 
 interface ProductDetailProps {
@@ -63,15 +69,15 @@ export default function ProductDetail({
 
         // Lấy thông tin sản phẩm từ API
         const productResponse = await axios.get(
-          `http://192.168.1.3:3000/products/${id}`
+          `http://192.168.1.34:3000/products/${id}`
         );
 
         // Lấy hình ảnh của sản phẩm
         const productImagesResponse = await axios.get(
-          "http://192.168.1.3:3000/product_images"
+          "http://192.168.1.34:3000/product_images"
         );
         const productSizeResponse = await axios.get(
-          "http://192.168.1.3:3000/product_sizes"
+          "http://192.168.1.34:3000/product_sizes"
         );
 
         // Lấy tất cả các kích cỡ
@@ -89,6 +95,12 @@ export default function ProductDetail({
         };
 
         setProduct(productWithImage);
+
+        // Đặt mặc định size M nếu chưa chọn size
+        const defaultSize = productSizeResponse.data.find(
+          (size: Size) => size.size === "M"
+        );
+        setSelectedSize(defaultSize || null);
       } catch (error) {
         console.error("Error fetching product details:", error);
       } finally {
@@ -105,7 +117,7 @@ export default function ProductDetail({
     // Cập nhật giá sau khi thay đổi kích cỡ
     setProduct((prevProduct) => {
       if (prevProduct) {
-        const updatedPrice = Number(size.price_adjustment) || 0;
+        const updatedPrice = Number(size.price_adjustment) || prevProduct.price;
         return { ...prevProduct, price: updatedPrice };
       }
       return prevProduct;
@@ -119,6 +131,53 @@ export default function ProductDetail({
   const handleDecreaseQuantity = () => {
     if (quantity > 1) {
       setQuantity((prevQuantity) => prevQuantity - 1);
+    }
+  };
+  const handleAddToCart = async () => {
+    try {
+      const fetchCartData = async (userId: number) => {
+        if (!product) {
+          alert("Product not found");
+          return;
+        }
+        let cartId;
+        const cartResponse = await axios.get(
+          `http://192.168.1.34:3000/carts?user_id=${userId}`
+        );
+
+        if (cartResponse.data.length > 0) {
+          cartId = cartResponse.data[0].id;
+        } else {
+          const newCartResponse = await axios.post(
+            "http://192.168.1.34:3000/carts",
+            { user_id: userId }
+          );
+          cartId = newCartResponse.data.id;
+        }
+
+        // Thêm sản phẩm vào cart_items
+        await axios.post("http://192.168.1.34:3000/cart_items", {
+          product_id: product.id,
+          quantity: quantity,
+          cart_id: cartId,
+          size: selectedSize?.size || "M", // Mặc định size là M
+          adjusted_price: finalPrice, // Sử dụng finalPrice đã tính toán
+        });
+
+        // Chuyển đến màn hình giỏ hàng
+        navigation.navigate("Cart", {
+          user_id: userId,
+          size: selectedSize?.size || "M", // Mặc định size là M
+          adjustment_price_: finalPrice || 0, // Đảm bảo finalPrice có giá trị hợp lệ
+          finalPrice, // Thêm finalPrice vào tham số
+        });
+      };
+
+      // Chỉ cần gọi hàm fetchCartData với userId thực tế
+      fetchCartData(1); // Ví dụ: userId là 1
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      alert("Failed to add item to cart.");
     }
   };
 
@@ -200,7 +259,6 @@ export default function ProductDetail({
                   style={{
                     backgroundColor:
                       selectedSize?.id === size.id ? "#EDDCC6" : "#fff",
-
                     borderWidth: 1,
                     padding: 10,
                     marginHorizontal: 5,
@@ -208,7 +266,9 @@ export default function ProductDetail({
                     borderColor: "#ccc",
                   }}
                 >
-                  <Text>{`${size.size} (+${size.price_adjustment} $)`}</Text>
+                  <Text>{`${size.size} (+${Math.floor(
+                    size.price_adjustment
+                  )} $)`}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -228,83 +288,73 @@ export default function ProductDetail({
                 width: "100%",
                 justifyContent: "space-between",
                 alignItems: "center",
-                paddingHorizontal: 20,
+                marginBottom: 20,
                 borderTopWidth: 1,
-                borderTopColor: "#ccc",
+                borderColor: "#ccc",
+                paddingHorizontal: 10,
               }}
             >
+              <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+                {finalPrice} $
+              </Text>
+
               <View
                 style={{
                   flexDirection: "row",
+                  alignItems: "center",
                   justifyContent: "center",
-                  marginTop: 30,
+                  marginTop: 1,
                 }}
               >
                 <TouchableOpacity
                   onPress={handleDecreaseQuantity}
                   style={{
-                    height: 40,
+                    backgroundColor: "#230C02",
                     width: 40,
-                    backgroundColor: "#fff",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    height: 40,
                     borderRadius: 10,
-                    borderColor: "black",
-                    borderWidth: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginRight: 15,
                   }}
                 >
-                  <Text style={{ fontSize: 25, fontWeight: "bold" }}>-</Text>
+                  <Text style={{ fontSize: 24, color: "#fff" }}>-</Text>
                 </TouchableOpacity>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    fontWeight: "bold",
-                    marginHorizontal: 15,
-                    marginVertical: 5,
-                  }}
-                >
+
+                <Text style={{ fontSize: 20, fontWeight: "bold" }}>
                   {quantity}
                 </Text>
+
                 <TouchableOpacity
                   onPress={handleIncreaseQuantity}
                   style={{
-                    height: 40,
+                    backgroundColor: "#230C02",
                     width: 40,
-                    backgroundColor: "#fff",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    height: 40,
                     borderRadius: 10,
-                    borderColor: "black",
-                    borderWidth: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginLeft: 15,
                   }}
                 >
-                  <Text style={{ fontSize: 20, fontWeight: "bold" }}>+</Text>
+                  <Text style={{ fontSize: 24, color: "#fff" }}>+</Text>
                 </TouchableOpacity>
               </View>
-
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "#EDDCC6",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: 50,
-                  width: 200,
-                  marginTop: 30,
-                  borderRadius: 20,
-                  borderColor: "black",
-                  borderWidth: 1,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 20,
-                    fontWeight: "bold",
-                  }}
-                >
-                  Total: {finalPrice} $
-                </Text>
-              </TouchableOpacity>
             </View>
+
+            <TouchableOpacity
+              onPress={handleAddToCart}
+              style={{
+                backgroundColor: "#230C02",
+                width: "80%",
+                height: 60,
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: 20,
+              }}
+            >
+              <Text style={{ fontSize: 18, color: "#fff" }}>Add to Cart</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
