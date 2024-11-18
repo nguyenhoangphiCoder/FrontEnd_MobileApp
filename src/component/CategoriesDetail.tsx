@@ -11,6 +11,7 @@ import {
 import axios from "axios";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { API_BASE_URL } from "../../ip_API";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface Product {
   id: number;
@@ -40,7 +41,7 @@ type RootDrawerParamList = {
     Product: Product[];
   };
   CategoryProducts: { category_id: number; name: string };
-  ProductDetail: { id: number };
+  ProductDetail: { id: number; user_id: number };
 };
 
 interface CategoryProductsScreenProps {
@@ -143,10 +144,25 @@ export default function CategoryProductsScreen({
     return <Text>Loading...</Text>;
   }
 
+  // Lấy user_id từ AsyncStorage
+  const getUserId = async () => {
+    const user_id = await AsyncStorage.getItem("user_id");
+    return user_id;
+  };
+
+  // Hàm điều hướng và truyền user_id
+  const handleNavigation = async (productId: number) => {
+    const user_id_string = await getUserId(); // Lấy user_id từ AsyncStorage
+
+    // Chuyển user_id thành kiểu number
+    const user_id = user_id_string ? parseInt(user_id_string) : 0;
+
+    // Điều hướng và truyền productId cùng với user_id
+    navigation.navigate("ProductDetail", { id: productId, user_id });
+  };
+
   return (
-    <SafeAreaView
-      style={{ backgroundColor: "#F0F0F0", flex: 1, paddingTop: 20 }}
-    >
+    <SafeAreaView style={{ backgroundColor: "#eee", flex: 1, paddingTop: 30 }}>
       <View style={{ backgroundColor: "#230C02", paddingBottom: 10 }}>
         <View
           style={{
@@ -187,7 +203,7 @@ export default function CategoryProductsScreen({
             style={{ padding: 10 }}
           >
             <Image
-              source={require("../images/cart2.jpg")}
+              source={require("../images/cart.jpg")}
               style={{ height: 30, width: 30, borderRadius: 5 }}
             />
           </TouchableOpacity>
@@ -206,25 +222,24 @@ export default function CategoryProductsScreen({
       </View>
 
       <FlatList
+        style={{ padding: 20 }}
         data={filteredProducts}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("ProductDetail", { id: item.id })
-            }
+            onPress={() => handleNavigation(item.id)} // Gọi handleNavigation
             style={{
-              marginVertical: 10,
-              backgroundColor: "#fff",
               flexDirection: "row",
-              padding: 15,
+              backgroundColor: "#f9f9f9",
               borderRadius: 15,
+              width: "100%",
+              padding: 15,
+              marginVertical: 10,
               shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.1,
-              shadowRadius: 5,
-              elevation: 3,
-              alignItems: "center",
-              justifyContent: "space-between",
+              shadowRadius: 8,
+              elevation: 5,
             }}
           >
             <Image
@@ -232,21 +247,21 @@ export default function CategoryProductsScreen({
                 uri: item.image || "http://via.placeholder.com/250x250",
               }}
               style={{
-                width: 100,
-                height: 100,
-                borderRadius: 10,
+                height: 80,
+                width: 80,
                 marginRight: 15,
+                borderRadius: 10,
               }}
             />
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 18, fontWeight: "600" }}>
+              <Text style={{ fontSize: 18, fontWeight: "bold", color: "#333" }}>
                 {item.name}
               </Text>
-              <Text style={{ fontSize: 14, color: "#777" }}>
+              <Text style={{ fontSize: 16, color: "#333" }}>
                 {item.description}
               </Text>
             </View>
-            <Text style={{ fontSize: 18, fontWeight: "600", color: "#FF6347" }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#333" }}>
               ${Math.floor(adjustedPrices[item.id])}
             </Text>
           </TouchableOpacity>

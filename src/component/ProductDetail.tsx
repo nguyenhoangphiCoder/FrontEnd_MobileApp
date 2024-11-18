@@ -56,7 +56,10 @@ export default function ProductDetail({
   navigation,
   route,
 }: ProductDetailProps) {
-  const { id } = route.params; // Nhận productId từ tham số truyền vào
+  // Nhận productId và user_id từ tham số truyền vào
+
+  const { id, user_id } = route.params; // Nhận productId từ tham số truyền vào
+  console.log("Received user_id:", user_id);
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [sizes, setSizes] = useState<Size[]>([]);
@@ -175,7 +178,7 @@ export default function ProductDetail({
       };
 
       // Chỉ cần gọi hàm fetchCartData với userId thực tế
-      fetchCartData(1); // Ví dụ: userId là 1
+      fetchCartData(14); // Ví dụ: userId là 1
     } catch (error) {
       console.error("Error adding to cart:", error);
       alert("Failed to add item to cart.");

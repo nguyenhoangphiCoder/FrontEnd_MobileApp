@@ -63,7 +63,8 @@ export default function Login({ navigation }: LoginProps) {
               JSON.stringify(userData.addresses)
             ); // Lưu địa chỉ
           }
-
+          // Lưu user_id riêng biệt nếu cần
+          // await AsyncStorage.setItem("user_id", userData.id.toString()); // Lưu user_id
           // Điều hướng tới màn hình MyDrawer và truyền dữ liệu người dùng
           navigation.navigate("MyDrawer", { user: userData });
           console.log(userData);

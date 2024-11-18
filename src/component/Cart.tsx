@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Alert,
 } from "react-native";
 import axios from "axios";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
@@ -32,6 +33,14 @@ type RootDrawerParamList = {
     size: string;
     price_adjustment: number;
   };
+  Order: {
+    cartItems: CartItem[];
+    user_id: number;
+    totalPrice: number;
+    shippingAddress: string;
+    cart_id: number;
+  };
+  Login: undefined;
 };
 
 interface CartProps {
@@ -43,6 +52,7 @@ export default function Cart({ navigation, route }: CartProps) {
   const { user_id } = route.params;
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [cartId, setCartId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -52,6 +62,7 @@ export default function Cart({ navigation, route }: CartProps) {
         );
         const cartId = cartResponse.data[0]?.id;
         if (cartId) {
+          setCartId(cartId);
           const cartItemsResponse = await axios.get(
             `${API_BASE_URL}/cart_items?cart_id=${cartId}`
           );
@@ -98,7 +109,7 @@ export default function Cart({ navigation, route }: CartProps) {
     };
 
     fetchCartItems();
-  }, [user_id]);
+  }, [user_id, cartId]);
 
   const handleRemoveItem = async (itemId: number, price: number) => {
     try {
@@ -106,10 +117,49 @@ export default function Cart({ navigation, route }: CartProps) {
       setCartItems((prevItems) =>
         prevItems.filter((item) => item.id !== itemId)
       );
-
       setTotalPrice((prevTotal) => prevTotal - (price || 0));
     } catch (error) {
       console.error("Error removing item from cart:", error);
+    }
+  };
+
+  const handleCheckout = async () => {
+    if (!user_id) {
+      Alert.alert("Session Expired", "Please log in again.", [
+        { text: "Log In", onPress: () => navigation.navigate("Login") },
+        { text: "Cancel", style: "cancel" },
+      ]);
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      Alert.alert(
+        "Cart is empty",
+        "Please add items to your cart before proceeding to checkout.",
+        [{ text: "OK" }]
+      );
+      return;
+    }
+
+    try {
+      await Promise.all(
+        cartItems.map((item) =>
+          axios.delete(`${API_BASE_URL}/cart_items/${item.id}`)
+        )
+      );
+
+      setCartItems([]);
+      setTotalPrice(0);
+
+      navigation.navigate("Order", {
+        cartItems,
+        user_id,
+        totalPrice,
+        shippingAddress: "Ninh Kieu, Can Tho",
+        cart_id: cartId!,
+      });
+    } catch (error) {
+      console.error("Error during checkout:", error);
     }
   };
 
@@ -151,16 +201,16 @@ export default function Cart({ navigation, route }: CartProps) {
               key={item.id}
               style={{
                 flexDirection: "row",
-                backgroundColor: "#F4F1E1",
+                backgroundColor: "#f4f4f4",
                 borderRadius: 15,
                 width: "90%",
                 padding: 15,
                 marginVertical: 10,
                 shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.2,
-                shadowRadius: 5,
-                elevation: 3,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                elevation: 5,
               }}
             >
               <Image
@@ -176,11 +226,17 @@ export default function Cart({ navigation, route }: CartProps) {
                 }}
               />
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                <Text
+                  style={{ fontSize: 16, fontWeight: "bold", color: "#333" }}
+                >
                   {item.product.name}
                 </Text>
-                <Text style={{ fontSize: 14 }}>Size: {item.size}</Text>
-                <Text style={{ fontSize: 14 }}>Quantity: x{item.quantity}</Text>
+                <Text style={{ fontSize: 14, color: "#666" }}>
+                  Size: {item.size}
+                </Text>
+                <Text style={{ fontSize: 14, color: "#666" }}>
+                  Quantity: x{item.quantity}
+                </Text>
                 <TouchableOpacity
                   onPress={() => handleRemoveItem(item.id, item.adjusted_price)}
                   style={{
@@ -212,7 +268,7 @@ export default function Cart({ navigation, route }: CartProps) {
         style={{
           flexDirection: "row",
           alignItems: "center",
-          backgroundColor: "#F4F1E1",
+          backgroundColor: "#eee",
           paddingVertical: 15,
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
@@ -224,24 +280,31 @@ export default function Cart({ navigation, route }: CartProps) {
         >
           Total:
         </Text>
-        <Text
-          style={{ fontSize: 18, fontWeight: "bold", marginHorizontal: 10 }}
-        >
-          {totalPrice} $
+        <Text style={{ fontSize: 22, fontWeight: "bold", color: "#230C02" }}>
+          {` ${Math.floor(totalPrice)} $`}
         </Text>
+      </View>
+
+      <View
+        style={{
+          padding: 20,
+          backgroundColor: "#fff",
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+        }}
+      >
         <TouchableOpacity
+          onPress={handleCheckout}
           style={{
-            height: 50,
-            width: 160,
             backgroundColor: "#230C02",
+            paddingVertical: 15,
             borderRadius: 10,
             alignItems: "center",
-            justifyContent: "center",
-            marginLeft: 50,
+            marginBottom: 10,
           }}
         >
-          <Text style={{ fontSize: 16, fontWeight: "bold", color: "#fff" }}>
-            Check Out
+          <Text style={{ color: "#fff", fontSize: 18 }}>
+            Proceed to Checkout
           </Text>
         </TouchableOpacity>
       </View>

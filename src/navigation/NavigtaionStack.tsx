@@ -4,16 +4,16 @@ import React from "react";
 import Login from "../Screens/Login";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import Home from "../Screens/Home";
-import Order from "../Screens/Order";
 import UserProfile from "../Screens/UserProfile";
 import SignUp from "../component/SignUp";
 import CoffeeCategories from "../component/CategoriesDetail";
-
 import Cart from "../component/Cart";
 import UpdateUserProfile from "../component/UpdateUserprofile";
 import SetAddress from "../component/SetAddress";
 import CategoryProductsScreen from "../component/CategoriesDetail";
 import ProductDetail from "../component/ProductDetail";
+import Order from "../Screens/Order";
+import OrderHistory from "../component/OrderHistory";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -26,6 +26,7 @@ const MyDrawer = () => {
     >
       <Drawer.Screen name="Home" component={Home} />
       <Drawer.Screen name="Order" component={Order} />
+      <Drawer.Screen name="OrderHistory" component={OrderHistory} />
       <Drawer.Screen name="UserProfile" component={UserProfile} />
     </Drawer.Navigator>
   );

@@ -13,21 +13,23 @@ import {
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import axios from "axios";
 import { API_BASE_URL } from "../../ip_API";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type RootDrawerParamList = {
   Home: undefined;
   Order: undefined;
   CategoriesDetail: { category_id: number };
-  Cart: { cart: any };
+  Cart: { cart: any; user_id: number };
   TeaCategories: undefined;
   PhindiCategories: undefined;
   MilkTeaCategories: undefined;
   FreezeCategories: undefined;
-  ProductDetail: { id: number };
+  ProductDetail: { id: number; user_id: number };
 };
 
 interface HomeProps {
   navigation: DrawerNavigationProp<RootDrawerParamList>;
+  route: any;
 }
 
 interface Product {
@@ -49,12 +51,14 @@ interface Category {
   route: keyof RootDrawerParamList;
 }
 
-export default function Home({ navigation }: HomeProps) {
+export default function Home({ navigation, route }: HomeProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [cart, setCart] = useState<any>(null);
+  const [userId, setUserId] = useState<number | null>(null); // Dùng để lưu trữ user_id
 
+  // console.log(`route.params :`, route.params);
   const scrollX = new Animated.Value(0);
   const { width } = Dimensions.get("window");
 
@@ -63,6 +67,7 @@ export default function Home({ navigation }: HomeProps) {
       const response = await axios.get(
         `${API_BASE_URL}/carts?user_id=${user_id}`
       );
+      console.log(`response`, response);
       setCart(response.data);
     } catch (error) {
       console.error("Lỗi khi tải giỏ hàng:", error);
@@ -70,6 +75,17 @@ export default function Home({ navigation }: HomeProps) {
   };
 
   useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const storedUserId = await AsyncStorage.getItem("user_id");
+        console.log("Stored user_id:", storedUserId);
+        if (storedUserId) {
+          setUserId(Number(storedUserId)); // Chuyển đổi giá trị sang số
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy user_id từ AsyncStorage:", error);
+      }
+    };
     async function fetchData() {
       try {
         const productsResponse = await axios.get(`${API_BASE_URL}/products`);
@@ -100,7 +116,8 @@ export default function Home({ navigation }: HomeProps) {
 
         setCategories(loadedCategories);
         setProducts(productsWithImages);
-        fetchCartData(14); // Ví dụ: user_id = 14
+        fetchCartData(14);
+        fetchUserId(); // Ví dụ: user_id = 14
       } catch (error) {
         console.error("Lỗi khi tải danh sách sản phẩm:", error);
       }
@@ -119,13 +136,29 @@ export default function Home({ navigation }: HomeProps) {
     require("../images/Promotion2.jpg"),
     require("../images/Promotion4.jpg"),
   ];
+  const handleGoToCart = () => {
+    if (userId !== null) {
+      console.log("Navigating to cart with user_id:", userId);
+      navigation.navigate("Cart", { cart, user_id: userId });
+    } else {
+      console.log("user_id không tồn tại!");
+    }
+  };
+  const handleGoToProductDetail = (product: Product) => {
+    if (userId !== null) {
+      console.log("Navigating to cart with user_id:", userId);
+      navigation.navigate("ProductDetail", { id: product.id, user_id: userId });
+    } else {
+      console.log("user_id không tồn tại!");
+    }
+  };
 
   return (
     <SafeAreaView style={{ backgroundColor: "#eee", flex: 1, marginTop: 20 }}>
       <View
         style={{
-          backgroundColor: "#eee",
-          height: 100,
+          backgroundColor: "#fff",
+          height: 70,
           flexDirection: "row",
           alignItems: "center",
         }}
@@ -144,7 +177,7 @@ export default function Home({ navigation }: HomeProps) {
             marginLeft: 15,
             width: 280,
             height: 40,
-            borderWidth: 2,
+
             borderRadius: 10,
           }}
         >
@@ -154,17 +187,15 @@ export default function Home({ navigation }: HomeProps) {
               backgroundColor: "#fff",
               borderRadius: 15,
               paddingHorizontal: 10,
-              height: 35,
+              height: 40,
               fontSize: 15,
+              borderWidth: 2,
             }}
             value={searchTerm}
             onChangeText={setSearchTerm}
           />
         </View>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Cart", { cart })}
-          style={{ marginRight: 10 }}
-        >
+        <TouchableOpacity onPress={handleGoToCart} style={{ marginRight: 10 }}>
           <Image
             source={require("../images/cart.png")}
             style={{ height: 40, width: 40, borderRadius: 5, marginLeft: 10 }}
@@ -221,7 +252,13 @@ export default function Home({ navigation }: HomeProps) {
         </View>
 
         {/* Categories */}
-        <View style={{ backgroundColor: "#fff", paddingVertical: 10 }}>
+        <View
+          style={{
+            backgroundColor: "#fff",
+            paddingVertical: 10,
+            borderRadius: 10,
+          }}
+        >
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {categories.map((category) => (
               <TouchableOpacity
@@ -232,15 +269,18 @@ export default function Home({ navigation }: HomeProps) {
                   })
                 }
                 style={{
-                  backgroundColor: "#Eee",
-                  borderRadius: 20,
-                  marginHorizontal: 10,
-                  height: 50,
-                  width: 90,
-                  justifyContent: "center",
+                  width: 150,
                   alignItems: "center",
-                  padding: 10,
-                  borderWidth: 2,
+                  justifyContent: "center",
+                  padding: 15,
+                  borderRadius: 10,
+                  backgroundColor: "#fff",
+                  marginLeft: 10,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 5,
                 }}
               >
                 <Text
@@ -281,7 +321,7 @@ export default function Home({ navigation }: HomeProps) {
               >
                 <Image
                   source={image}
-                  style={{ width: width - 30, height: 170, borderRadius: 10 }}
+                  style={{ width: width - 20, height: 170, borderRadius: 10 }}
                 />
               </View>
             ))}
@@ -309,14 +349,21 @@ export default function Home({ navigation }: HomeProps) {
             {filteredProducts.map((product) => (
               <TouchableOpacity
                 key={product.id}
-                onPress={() =>
-                  navigation.navigate("ProductDetail", { id: product.id })
-                }
+                onPress={() => handleGoToProductDetail(product)} // Pass category here
                 style={{
-                  marginRight: 15,
+                  marginRight: 20,
                   width: 150,
                   alignItems: "center",
-                  marginBottom: 20,
+                  justifyContent: "center",
+                  padding: 20,
+                  borderRadius: 10,
+                  backgroundColor: "#fff",
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 5,
+                  left: 15,
                 }}
               >
                 <Image
@@ -324,12 +371,10 @@ export default function Home({ navigation }: HomeProps) {
                     uri: product.image || "http://via.placeholder.com/250x250",
                   }}
                   style={{
-                    width: 120,
-                    height: 120,
-                    borderRadius: 15,
-                    marginBottom: 5,
-
-                    borderWidth: 2,
+                    width: 100,
+                    height: 100,
+                    borderRadius: 10,
+                    marginBottom: 10,
                   }}
                 />
                 <Text
@@ -338,11 +383,18 @@ export default function Home({ navigation }: HomeProps) {
                     fontWeight: "bold",
                     textAlign: "center",
                     fontSize: 14,
+                    marginBottom: 5,
                   }}
                 >
                   {product.name}
                 </Text>
-                <Text style={{ textAlign: "center" }}>
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontSize: 15,
+                    fontWeight: "bold",
+                  }}
+                >
                   {product.price.toLocaleString()} $
                 </Text>
               </TouchableOpacity>

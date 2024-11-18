@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   Text,
@@ -6,55 +7,205 @@ import {
   Image,
   ScrollView,
   Alert,
+  FlatList,
+  ActivityIndicator,
 } from "react-native";
-import React, { useState } from "react";
-import { NavigationProp } from "@react-navigation/native";
+import { NavigationProp, RouteProp } from "@react-navigation/native";
+import axios from "axios";
+import { API_BASE_URL } from "../../ip_API";
+import { StackNavigationProp } from "@react-navigation/stack";
 
-interface OrderProps {
-  navigation: NavigationProp<any>;
+interface CartItem {
+  id: number;
+  product: {
+    id: number;
+    image: string;
+    name: string;
+  };
+  size: string;
+  quantity: number;
+  adjusted_price: string | number;
 }
 
-export default function Order({ navigation }: OrderProps) {
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("COD");
+type RootDrawerParamList = {
+  Home: undefined;
+  Order: {
+    cartItems: CartItem[];
+    user_id: number;
+    totalPrice: number;
+    shippingAddress: string;
+    cart_id: number;
+  };
+  Cart: {
+    user_id: number;
+  };
+  OrderHistory: {
+    user_id: number;
+    orderId: number;
+  };
+};
 
-  const handleConfirmOrder = () => {
-    // Thực hiện xác nhận đơn hàng ở đây, ví dụ gọi API hoặc lưu vào cơ sở dữ liệu.
-    // Sau khi xử lý thành công, bạn có thể hiển thị thông báo
-    Alert.alert("Order Confirmed", "Your order has been successfully placed!");
-    // Điều hướng về màn hình chính hoặc trang khác sau khi xác nhận
-    navigation.navigate("Home");
+interface PaymentMethod {
+  payment_method_id: number;
+  provider_name: string;
+}
+
+type OrderProps = {
+  navigation: StackNavigationProp<RootDrawerParamList, "Order">;
+  route: RouteProp<RootDrawerParamList, "Order">;
+};
+
+export default function Order({ navigation, route }: OrderProps) {
+  const { cartItems, user_id, totalPrice, shippingAddress, cart_id } =
+    route.params;
+
+  const [userName, setUserName] = useState<string>("");
+  const [userPhone, setUserPhone] = useState<string>("");
+  const [userEmail, setEmail] = useState<string>("");
+  const [userAddress, setUserAddress] = useState<string>("");
+  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<
+    number | null
+  >(null);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  // Fetch user data
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/users/${user_id}`);
+        setUserName(response.data.name);
+        setUserPhone(response.data.phone_number);
+        setEmail(response.data.email);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        Alert.alert("Error", "Unable to load user data.");
+      }
+    };
+
+    if (user_id) {
+      fetchUserData();
+    }
+  }, [user_id]);
+
+  // Fetch user address
+  useEffect(() => {
+    const fetchUserAddress = async () => {
+      try {
+        const response = await axios.get(
+          `${API_BASE_URL}/addresses?user_id=${user_id}`
+        );
+        const address = response.data[0]; // Assuming the address array is returned
+        if (address) {
+          setUserAddress(
+            `${address.address_line}, ${address.city}, ${address.state}, ${address.country}`
+          );
+        } else {
+          setUserAddress("No address available");
+        }
+      } catch (error) {
+        console.error("Error fetching user address:", error);
+        Alert.alert("Error", "Unable to load address.");
+      }
+    };
+
+    if (user_id) {
+      fetchUserAddress();
+    }
+  }, [user_id]);
+
+  // Update cart items prices if they are in string format
+  const updatedCartItems = cartItems.map((item) => ({
+    ...item,
+    adjusted_price:
+      typeof item.adjusted_price === "string"
+        ? parseFloat(item.adjusted_price)
+        : item.adjusted_price,
+  }));
+
+  // Fetch payment methods
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`${API_BASE_URL}/payment_methods`);
+        setPaymentMethods(response.data); // Assuming API returns the list of payment methods
+      } catch (error) {
+        console.error("Error fetching payment methods:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPaymentMethods();
+  }, []);
+
+  // Handle selection of payment method
+  const handleSelectPaymentMethod = (paymentMethodId: number) => {
+    setSelectedPaymentMethodId(paymentMethodId);
+  };
+
+  // Confirm order and create order items
+  const handleConfirmOrder = async () => {
+    setLoading(true);
+    try {
+      // Ensure a payment method is selected
+      if (!selectedPaymentMethodId) {
+        Alert.alert("Error", "Please select a payment method.");
+        return;
+      }
+
+      // Create an order
+      const orderResponse = await axios.post(`${API_BASE_URL}/orders`, {
+        user_id,
+        cart_id,
+        payment_method_id: selectedPaymentMethodId, // Use the ID instead of provider name
+      });
+      const orderId = orderResponse.data.id;
+
+      // Add order items
+      for (const item of updatedCartItems) {
+        const { product, quantity, size, adjusted_price } = item;
+        await axios.post(`${API_BASE_URL}/order_items`, {
+          order_id: orderId,
+          product_id: product.id,
+          size: size,
+          quantity: quantity,
+          price: adjusted_price,
+        });
+      }
+
+      navigation.navigate("Home");
+      navigation.navigate("OrderHistory", { user_id, orderId });
+      Alert.alert("Success", "You have success confirm ");
+    } catch (error) {
+      console.error("Error confirming order:", error);
+      Alert.alert("Error", "Failed to place the order.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        marginTop: 35,
-        backgroundColor: "#fff",
-      }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff", marginTop: 35 }}>
       {/* Header */}
       <View
         style={{
           height: 50,
-          backgroundColor: "#fff",
           flexDirection: "row",
           alignItems: "center",
-          paddingHorizontal: 10,
+          paddingHorizontal: 15,
+          backgroundColor: "#F8F8F8",
+          borderBottomWidth: 1,
+          borderBottomColor: "#ddd",
         }}
       >
         <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("Home");
-          }}
-          style={{
-            padding: 5,
-            marginRight: 10,
-          }}
+          onPress={() => navigation.navigate("Home")}
+          style={{ padding: 5, marginRight: 15 }}
         >
           <Image
             source={require("../images/vector-back-icon.jpg")}
-            style={{ height: 37, width: 37, borderRadius: 5 }}
+            style={{ height: 30, width: 30, borderRadius: 5 }}
           />
         </TouchableOpacity>
         <Text
@@ -70,159 +221,144 @@ export default function Order({ navigation }: OrderProps) {
       </View>
 
       {/* Cart Items */}
-      <ScrollView
-        contentContainerStyle={{ alignItems: "center", paddingVertical: 20 }}
-      >
-        <View
-          style={{
-            flexDirection: "column",
-            backgroundColor: "#EDDCC6",
-            borderRadius: 25,
-            width: "90%",
-            padding: 20,
-            marginVertical: 15,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 5,
-            elevation: 5,
-          }}
-        >
-          {/* Hình ảnh và thông tin sản phẩm */}
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <ScrollView contentContainerStyle={{ padding: 20 }}>
+        {cartItems.map((item) => (
+          <View
+            key={item.id}
+            style={{
+              flexDirection: "row",
+              backgroundColor: "#f9f9f9",
+              borderRadius: 15,
+              width: "100%",
+              padding: 15,
+              marginVertical: 10,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+              elevation: 5,
+            }}
+          >
             <Image
-              source={require("../images/Logo1.png")}
-              style={{ height: 100, width: 100, marginRight: 20 }}
-            />
-            <View style={{ flex: 1, justifyContent: "center" }}>
-              <Text
-                style={{ fontSize: 18, fontWeight: "bold", marginBottom: 5 }}
-              >
-                Coffee
-              </Text>
-              <Text style={{ fontSize: 16, color: "#444" }}>Size: Large</Text>
-              <Text style={{ fontSize: 16, color: "#444" }}>Quantity: x2</Text>
-            </View>
-            <View
-              style={{
-                alignItems: "flex-end",
+              source={{
+                uri: item.product.image || "http://via.placeholder.com/100x100",
               }}
-            >
-              <View
-                style={{
-                  alignItems: "center",
-                }}
-              >
-                <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-                  50000 VND
-                </Text>
-              </View>
+              style={{
+                height: 80,
+                width: 80,
+                marginRight: 15,
+                borderRadius: 10,
+              }}
+            />
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 16, fontWeight: "bold", color: "#333" }}>
+                {item.product.name}
+              </Text>
+              <Text style={{ color: "#777" }}>Size: {item.size}</Text>
+              <Text style={{ color: "#777" }}>Quantity: x{item.quantity}</Text>
             </View>
+            <Text style={{ fontSize: 16, fontWeight: "bold", color: "#333" }}>
+              {`${Math.floor(+item.adjusted_price)} $`}
+            </Text>
           </View>
-
-          {/* Giá sản phẩm */}
-        </View>
+        ))}
       </ScrollView>
 
-      {/* Footer */}
+      {/* Payment Method */}
+      <View style={{ padding: 20, backgroundColor: "#fff" }}>
+        <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 10 }}>
+          Payment Method:
+        </Text>
+        {loading ? (
+          <ActivityIndicator size="large" color="#230C02" />
+        ) : (
+          <FlatList
+            data={paymentMethods}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={{
+                  padding: 12,
+                  backgroundColor:
+                    selectedPaymentMethodId === item.payment_method_id
+                      ? "#E8E8E8"
+                      : "#fff",
+                  borderRadius: 10,
+                  marginVertical: 5,
+                  borderWidth:
+                    selectedPaymentMethodId === item.payment_method_id ? 1 : 3,
+                  borderColor: "#ddd",
+                  alignItems: "center",
+                }}
+                onPress={() =>
+                  handleSelectPaymentMethod(item.payment_method_id)
+                }
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color:
+                      selectedPaymentMethodId === item.payment_method_id
+                        ? "#230C02"
+                        : "black",
+                  }}
+                >
+                  {item.provider_name}
+                </Text>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(item) => item.payment_method_id.toString()}
+          />
+        )}
+      </View>
+
+      {/* Shipping Address */}
+      <View style={{ padding: 20, backgroundColor: "#fff" }}>
+        <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 10 }}>
+          Name : {userName || "Loading address..."}
+        </Text>
+        <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 10 }}>
+          Phone_number : {userPhone || "Loading address..."}
+        </Text>
+        <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 10 }}>
+          Email : {userEmail || "Loading address..."}
+        </Text>
+        <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 10 }}>
+          Address : {userAddress || "Loading address..."}
+        </Text>
+      </View>
+
+      {/* Total Price */}
       <View
         style={{
-          backgroundColor: "#EDDCC6",
+          paddingHorizontal: 20,
           paddingVertical: 15,
-          borderTopLeftRadius: 30,
-          borderTopRightRadius: 30,
-          paddingHorizontal: 10,
+          backgroundColor: "#fff",
+          borderTopWidth: 1,
+          borderTopColor: "#ddd",
         }}
       >
-        <View style={{ paddingBottom: 10 }}>
-          <View style={{ flexDirection: "row", marginVertical: 5 }}>
-            <Text style={{ fontSize: 15, fontWeight: "bold" }}>Total:</Text>
-            <Text style={{ fontSize: 15, fontWeight: "bold", marginLeft: 10 }}>
-              450000 VND
-            </Text>
-          </View>
-          <View style={{ flexDirection: "row", marginVertical: 5 }}>
-            <Text style={{ fontSize: 15, fontWeight: "bold" }}>Name:</Text>
-            <Text style={{ fontSize: 15, marginLeft: 10 }}>
-              nguyen hoang phi
-            </Text>
-          </View>
-          <View style={{ flexDirection: "row", marginVertical: 5 }}>
-            <Text style={{ fontSize: 15, fontWeight: "bold" }}>Phone:</Text>
-            <Text style={{ fontSize: 15, marginLeft: 10 }}>0945327617</Text>
-          </View>
-          <View style={{ flexDirection: "row", marginVertical: 5 }}>
-            <Text style={{ fontSize: 15, fontWeight: "bold" }}>Address:</Text>
-            <Text style={{ fontSize: 15, marginLeft: 10 }}>
-              ninh kieu can tho
-            </Text>
-          </View>
-          <View style={{ flexDirection: "row", marginVertical: 5 }}>
-            <Text style={{ fontSize: 15, fontWeight: "bold" }}>
-              Payment Method:
-            </Text>
-            <View style={{ flexDirection: "row" }}>
-              <TouchableOpacity
-                onPress={() => setSelectedPaymentMethod("COD")}
-                style={{
-                  height: 30,
-                  width: 60,
-                  backgroundColor:
-                    selectedPaymentMethod === "COD" ? "#230C02" : "#fff",
-                  borderRadius: 5,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginLeft: 10,
-                }}
-              >
-                <Text
-                  style={{
-                    color: selectedPaymentMethod === "COD" ? "#fff" : "#000",
-                  }}
-                >
-                  COD
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => setSelectedPaymentMethod("VISA")}
-                style={{
-                  height: 30,
-                  width: 60,
-                  backgroundColor:
-                    selectedPaymentMethod === "VISA" ? "#230C02" : "#fff",
-                  borderRadius: 5,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginLeft: 10,
-                }}
-              >
-                <Text
-                  style={{
-                    color: selectedPaymentMethod === "VISA" ? "#fff" : "#000",
-                  }}
-                >
-                  VISA
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: "bold",
+            textAlign: "center",
+            marginBottom: 10,
+          }}
+        >
+          Total: {totalPrice} $
+        </Text>
+
         <TouchableOpacity
           onPress={handleConfirmOrder}
           style={{
-            height: 55,
             backgroundColor: "#230C02",
+            paddingVertical: 12,
             borderRadius: 10,
             alignItems: "center",
-            justifyContent: "center",
-            alignSelf: "center",
-            width: "80%",
-            marginTop: 20,
+            marginTop: 10,
           }}
         >
-          <Text style={{ fontSize: 20, fontWeight: "bold", color: "#fff" }}>
-            Confirm
-          </Text>
+          <Text style={{ color: "#fff", fontSize: 16 }}>Confirm Order</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
