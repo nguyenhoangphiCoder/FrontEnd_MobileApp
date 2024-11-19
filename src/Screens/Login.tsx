@@ -28,7 +28,7 @@ export default function Login({ navigation }: LoginProps) {
   const [password, setPassword] = useState<string>("223322");
 
   const api = axios.create({
-    baseURL: ` ${API_BASE_URL}`, // Địa chỉ API của bạn
+    baseURL: `${API_BASE_URL}`, // Địa chỉ API của bạn
     headers: {
       "Content-Type": "application/json",
     },
@@ -55,7 +55,13 @@ export default function Login({ navigation }: LoginProps) {
         if (userData) {
           await AsyncStorage.setItem("user", JSON.stringify(userData));
 
-          // Kiểm tra địa chỉ
+          // Lưu user_id nếu có
+          if (userData.id) {
+            await AsyncStorage.setItem("user_id", userData.id.toString());
+            console.log("User ID đã được lưu:", userData.id);
+          }
+
+          // Kiểm tra và lưu địa chỉ
           if (userData.addresses && userData.addresses.length > 0) {
             console.log("Addresses:", userData.addresses);
             await AsyncStorage.setItem(
@@ -63,8 +69,7 @@ export default function Login({ navigation }: LoginProps) {
               JSON.stringify(userData.addresses)
             ); // Lưu địa chỉ
           }
-          // Lưu user_id riêng biệt nếu cần
-          // await AsyncStorage.setItem("user_id", userData.id.toString()); // Lưu user_id
+
           // Điều hướng tới màn hình MyDrawer và truyền dữ liệu người dùng
           navigation.navigate("MyDrawer", { user: userData });
           console.log(userData);

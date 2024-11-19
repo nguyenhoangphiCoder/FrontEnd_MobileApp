@@ -40,8 +40,17 @@ type RootDrawerParamList = {
     user_id: number;
   };
   OrderHistory: {
+    totalPrice: number;
     user_id: number;
     orderId: number;
+    products: {
+      product_id: number;
+      product_name: string;
+      product_image: string;
+      size: string;
+      quantity: number;
+      price: number;
+    }[];
   };
 };
 
@@ -175,7 +184,19 @@ export default function Order({ navigation, route }: OrderProps) {
       }
 
       navigation.navigate("Home");
-      navigation.navigate("OrderHistory", { user_id, orderId });
+      navigation.navigate("OrderHistory", {
+        totalPrice,
+        user_id,
+        orderId,
+        products: updatedCartItems.map((item) => ({
+          product_id: item.product.id,
+          product_name: item.product.name,
+          product_image: item.product.image,
+          size: item.size,
+          quantity: item.quantity,
+          price: item.adjusted_price,
+        })),
+      });
       Alert.alert("Success", "You have success confirm ");
     } catch (error) {
       console.error("Error confirming order:", error);

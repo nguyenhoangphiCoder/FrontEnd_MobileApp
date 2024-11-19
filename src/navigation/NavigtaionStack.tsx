@@ -25,7 +25,7 @@ const MyDrawer = () => {
       screenOptions={{ headerShown: false }}
     >
       <Drawer.Screen name="Home" component={Home} />
-      <Drawer.Screen name="Order" component={Order} />
+
       <Drawer.Screen name="OrderHistory" component={OrderHistory} />
       <Drawer.Screen name="UserProfile" component={UserProfile} />
     </Drawer.Navigator>
@@ -45,6 +45,7 @@ const NavigationStack = () => {
           name="CategoriesDetail"
           component={CategoryProductsScreen}
         />
+        <Stack.Screen name="Order" component={Order} />
         <Stack.Screen name="ProductDetail" component={ProductDetail} />
         <Stack.Screen name="Cart" component={Cart} />
         <Stack.Screen name="UpdateUserProfile" component={UpdateUserProfile} />

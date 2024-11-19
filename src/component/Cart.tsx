@@ -55,6 +55,7 @@ export default function Cart({ navigation, route }: CartProps) {
   const [cartId, setCartId] = useState<number | null>(null);
 
   useEffect(() => {
+    console.log("User ID:", user_id);
     const fetchCartItems = async () => {
       try {
         const cartResponse = await axios.get(

@@ -140,21 +140,21 @@ export default function ProductDetail({
 
   const handleAddToCart = async () => {
     try {
-      const fetchCartData = async (userId: number) => {
+      const fetchCartData = async (user_id: number) => {
         if (!product) {
           alert("Product not found");
           return;
         }
         let cartId;
         const cartResponse = await axios.get(
-          `${API_BASE_URL}/carts?user_id=${userId}`
+          `${API_BASE_URL}/carts?user_id=${user_id}`
         );
 
         if (cartResponse.data.length > 0) {
           cartId = cartResponse.data[0].id;
         } else {
           const newCartResponse = await axios.post(`${API_BASE_URL}/carts`, {
-            user_id: userId,
+            user_id: user_id,
           });
           cartId = newCartResponse.data.id;
         }
@@ -170,7 +170,7 @@ export default function ProductDetail({
 
         // Chuyển đến màn hình giỏ hàng
         navigation.navigate("Cart", {
-          user_id: userId,
+          user_id: user_id,
           size: selectedSize?.size || "M", // Mặc định size là M
           adjustment_price_: finalPrice || 0, // Đảm bảo finalPrice có giá trị hợp lệ
           finalPrice, // Thêm finalPrice vào tham số
@@ -178,7 +178,7 @@ export default function ProductDetail({
       };
 
       // Chỉ cần gọi hàm fetchCartData với userId thực tế
-      fetchCartData(14); // Ví dụ: userId là 1
+      fetchCartData(user_id); // Ví dụ: userId là 1
     } catch (error) {
       console.error("Error adding to cart:", error);
       alert("Failed to add item to cart.");
@@ -266,12 +266,17 @@ export default function ProductDetail({
                 onPress={() => handleSizeChange(size)}
                 style={{
                   backgroundColor:
-                    selectedSize?.id === size.id ? "#Eee" : "#fff",
-                  borderWidth: 2,
+                    selectedSize?.id === size.id ? "#999" : "#fff",
+                  borderWidth: 1,
                   padding: 12,
                   marginHorizontal: 8,
                   borderRadius: 5,
                   borderColor: "#230C02",
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 1,
+                  shadowRadius: 10,
+                  elevation: 7,
                 }}
               >
                 <Text style={{ fontSize: 16 }}>
