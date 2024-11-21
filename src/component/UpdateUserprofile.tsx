@@ -88,7 +88,7 @@ export default function UpdateUserProfile({
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: "#F6F5F3", // Thay đổi màu nền cho nhẹ nhàng hơn
+        backgroundColor: "#eee", // Thay đổi màu nền cho nhẹ nhàng hơn
         marginTop: 30,
       }}
     >
@@ -139,13 +139,16 @@ export default function UpdateUserProfile({
           style={{
             height: 45,
             borderRadius: 10,
-            backgroundColor: "#FFFFFF", // Màu nền input
-            borderWidth: 1,
-            borderColor: "#230C02", // Màu viền
+            backgroundColor: "#FFF",
             paddingHorizontal: 15,
             marginBottom: 15,
             width: "100%",
             fontSize: 16,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 5,
+            elevation: 5,
           }}
         />
         <TextInput
@@ -155,13 +158,17 @@ export default function UpdateUserProfile({
           style={{
             height: 45,
             borderRadius: 10,
-            backgroundColor: "#FFFFFF", // Màu nền input
-            borderWidth: 1,
-            borderColor: "#230C02", // Màu viền
+            backgroundColor: "#FFFFFF",
+
             paddingHorizontal: 15,
             marginBottom: 15,
             width: "100%",
             fontSize: 16,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 5,
+            elevation: 5,
           }}
         />
 
@@ -172,13 +179,16 @@ export default function UpdateUserProfile({
           style={{
             height: 45,
             borderRadius: 10,
-            backgroundColor: "#FFFFFF", // Màu nền input
-            borderWidth: 1,
-            borderColor: "#230C02", // Màu viền
+            backgroundColor: "#FFFFFF",
             paddingHorizontal: 15,
             marginBottom: 15,
             width: "100%",
             fontSize: 16,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 5,
+            elevation: 5,
           }}
         />
         <TextInput
@@ -188,13 +198,17 @@ export default function UpdateUserProfile({
           style={{
             height: 45,
             borderRadius: 10,
-            backgroundColor: "#FFFFFF", // Màu nền input
-            borderWidth: 1,
-            borderColor: "#230C02", // Màu viền
+            backgroundColor: "#FFFFFF",
+
             paddingHorizontal: 15,
             marginBottom: 15,
             width: "100%",
             fontSize: 16,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 5,
+            elevation: 5,
           }}
         />
 
@@ -212,7 +226,7 @@ export default function UpdateUserProfile({
         >
           <Text
             style={{
-              color: "#EDDCC6", // Màu chữ của nút
+              color: "#ffff", // Màu chữ của nút
               fontSize: 18,
               fontWeight: "bold",
             }}

@@ -1,16 +1,18 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState } from "react";
 import {
   SafeAreaView,
   Text,
   View,
   FlatList,
   ActivityIndicator,
-  Alert,
+  TouchableOpacity,
+  Image,
 } from "react-native";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_BASE_URL } from "../../ip_API";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RouteProp, useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 
 interface Order {
   id: number;
@@ -20,6 +22,7 @@ interface Order {
   user: User;
   franchise: Franchise | null;
   order_items: OrderItem[];
+  totalPrice?: number;
 }
 
 interface PaymentMethod {
@@ -50,49 +53,34 @@ interface OrderItem {
 
 type RootDrawerParamList = {
   Home: undefined;
-  OrderHistory: {
-    totalPrice: number;
-    user_id: number;
-    orderId: number;
-    products: {
-      product_id: number;
-      product_name: string;
-      product_image: string;
-      size: string;
-      quantity: number;
-      price: number;
-    }[];
-  };
+  OrderHistory: undefined;
 };
 
 type OrderHistoryProps = {
   navigation: StackNavigationProp<RootDrawerParamList, "OrderHistory">;
-  route: RouteProp<RootDrawerParamList, "OrderHistory">;
 };
 
-export default function OrderHistory({ route }: OrderHistoryProps) {
+export default function OrderHistory({ navigation }: OrderHistoryProps) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const { user_id, orderId, products, totalPrice } = route.params;
 
   const fetchOrderHistory = async () => {
     try {
-      if (!user_id) {
-        setError("Không có user_id.");
+      setLoading(true);
+      setError(null);
+
+      const userId = await AsyncStorage.getItem("user_id");
+      if (!userId) {
+        setError("Không tìm thấy thông tin người dùng.");
         setLoading(false);
         return;
       }
 
-      setLoading(true);
-      console.log("Fetching orders for user_id:", user_id);
-
-      // Gọi API với user_id và API path mới
       const response = await axios.get(
-        `${API_BASE_URL}/orders/user/${user_id}/orders`
+        `${API_BASE_URL}/orders/user/${userId}/orders`
       );
       const ordersData: Order[] = response.data;
-      console.log("Orders data received:", ordersData);
 
       if (!ordersData || ordersData.length === 0) {
         setError("Không có đơn hàng nào.");
@@ -100,7 +88,6 @@ export default function OrderHistory({ route }: OrderHistoryProps) {
         return;
       }
 
-      // Lấy chi tiết các sản phẩm cho mỗi đơn hàng
       const enrichedOrders = await Promise.all(
         ordersData.map(async (order) => {
           const orderItemsResponse = await axios.get(
@@ -108,61 +95,61 @@ export default function OrderHistory({ route }: OrderHistoryProps) {
           );
           const orderItems = orderItemsResponse.data;
 
-          // Lấy tên sản phẩm cho từng đơn hàng
           const enrichedItems = await Promise.all(
-            orderItems.map(async (item) => {
-              // Kiểm tra xem product_id có hợp lệ không trước khi gọi API
-              if (!item.product_id) {
-                console.error("Không tìm thấy product_id cho item:", item);
-                return { ...item, name: "Không có tên sản phẩm" }; // Trả về tên mặc định nếu không có product_id
-              }
-
+            orderItems.map(async (item: any) => {
               try {
                 const productResponse = await axios.get(
                   `${API_BASE_URL}/products/${item.product_id}`
                 );
                 const product = productResponse.data;
 
-                // Kiểm tra nếu sản phẩm không có tên hoặc không tồn tại
-                if (!product || !product.name) {
-                  console.error(
-                    "Không tìm thấy sản phẩm với product_id:",
-                    item.product_id
-                  );
-                  return { ...item, name: "Không có tên sản phẩm" };
-                }
-
-                return { ...item, name: product.name };
+                return {
+                  ...item,
+                  name: product.name || "Không có tên sản phẩm",
+                  price: item.price,
+                };
               } catch (error) {
-                console.error("Error fetching product:", error);
-                return { ...item, name: "Lỗi khi tải sản phẩm" };
+                return {
+                  ...item,
+                  name: "Lỗi khi tải sản phẩm",
+                  price: item.price,
+                };
               }
             })
           );
 
-          return { ...order, order_items: enrichedItems };
+          const totalPrice = enrichedItems.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          );
+
+          return { ...order, order_items: enrichedItems, totalPrice };
         })
       );
 
       setOrders(enrichedOrders);
     } catch (error) {
-      console.error("Error fetching order history:", error);
-      setError("Không thể tải lịch sử đơn hàng. Vui lòng thử lại.");
+      setError("Order History is empty");
     } finally {
       setLoading(false);
     }
   };
 
-  // Gọi API khi màn hình được focus
   useFocusEffect(
     useCallback(() => {
       fetchOrderHistory();
-    }, [user_id])
+    }, [])
   );
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <ActivityIndicator size="large" color="#230C02" />
       </View>
     );
@@ -171,9 +158,20 @@ export default function OrderHistory({ route }: OrderHistoryProps) {
   if (error) {
     return (
       <SafeAreaView
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#fff",
+        }}
       >
-        <Text style={{ color: "red", fontSize: 18, textAlign: "center" }}>
+        <Text
+          style={{
+            fontSize: 18,
+            textAlign: "center",
+            paddingHorizontal: 20,
+          }}
+        >
           {error}
         </Text>
       </SafeAreaView>
@@ -181,10 +179,48 @@ export default function OrderHistory({ route }: OrderHistoryProps) {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f7f7f7", padding: 15 }}>
-      <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 15 }}>
-        Lịch sử đơn hàng
-      </Text>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: "#EEE",
+        marginTop: 35,
+      }}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          paddingVertical: 20,
+          backgroundColor: "#230C02",
+          alignItems: "center",
+          borderBottomWidth: 1,
+          borderBottomColor: "#fff",
+          marginBottom: 20,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 5,
+        }}
+      >
+        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+          <Image
+            source={require("../images/vector-back-icon.jpg")}
+            style={{ height: 37, width: 37, borderRadius: 5 }}
+          />
+        </TouchableOpacity>
+        <Text
+          style={{
+            fontSize: 22,
+            fontWeight: "bold",
+            color: "#fff",
+            flex: 1,
+            textAlign: "center",
+          }}
+        >
+          Order History
+        </Text>
+      </View>
+
       <FlatList
         data={orders}
         keyExtractor={(item) => item.id.toString()}
@@ -192,100 +228,133 @@ export default function OrderHistory({ route }: OrderHistoryProps) {
           <View
             style={{
               backgroundColor: "#fff",
-              borderRadius: 8,
+              borderRadius: 10,
               padding: 15,
               marginBottom: 15,
-              elevation: 2,
               shadowColor: "#000",
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.1,
-              shadowRadius: 4,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 8,
+              elevation: 5,
             }}
           >
             <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginBottom: 10,
+              }}
             >
-              <Text style={{ fontSize: 18, fontWeight: "bold", color: "#333" }}>
-                Mã đơn hàng: {item.id}
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "bold",
+                }}
+              >
+                Order Code: {item.id}
               </Text>
-              <Text style={{ color: "#777", fontSize: 14 }}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: "#777",
+                }}
+              >
                 {item.created_at}
               </Text>
             </View>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: "bold",
-                color: "#230C02",
-                marginVertical: 10,
-              }}
-            >
-              Tổng tiền: {totalPrice} $
-            </Text>
+            <View>
+              <View>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: "bold",
 
-            {item.franchise && (
-              <View style={{ marginTop: 10 }}>
-                <Text style={{ fontWeight: "bold" }}>Chi nhánh:</Text>
-                <Text>Tên: {item.franchise.name}</Text>
-                <Text>Địa chỉ: {item.franchise.address}</Text>
-              </View>
-            )}
-
-            {item.payment_method && (
-              <View
-                style={{
-                  marginTop: 15,
-                  backgroundColor: "#f1f1f1",
-                  padding: 10,
-                  borderRadius: 8,
-                }}
-              >
-                <Text style={{ fontWeight: "bold", marginBottom: 5 }}>
-                  Phương thức thanh toán
+                    marginVertical: 10,
+                  }}
+                >
+                  Total: {item.totalPrice} $
                 </Text>
 
-                <Text>Payment Method: {item.payment_method.provider_name}</Text>
-                <Text>TK: {item.payment_method.account_number}</Text>
-                <Text>Hạn sử dụng: {item.payment_method.expiry_date}</Text>
+                {item.payment_method && (
+                  <View style={{ marginBottom: 15 }}>
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        fontSize: 14,
+                      }}
+                    >
+                      Payment Method
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: "#555",
+                      }}
+                    >
+                      Method : {item.payment_method.provider_name}
+                    </Text>
+                  </View>
+                )}
               </View>
-            )}
+              <View>
+                <Text></Text>
+              </View>
+            </View>
 
             <Text
               style={{
-                marginTop: 15,
-                fontSize: 16,
                 fontWeight: "bold",
-                color: "#333",
+                fontSize: 16,
+                marginBottom: 5,
               }}
             >
-              Các sản phẩm
+              Products
             </Text>
             <FlatList
               data={item.order_items}
               keyExtractor={(orderItem, index) => index.toString()}
-              horizontal={true}
+              horizontal
               renderItem={({ item }: { item: OrderItem }) => (
                 <View
                   style={{
-                    marginRight: 15,
-                    paddingLeft: 10,
-                    borderLeftWidth: 4,
-                    borderLeftColor: "#230C02",
-                    alignItems: "center",
+                    marginRight: 10,
+                    backgroundColor: "#eee",
+                    borderRadius: 8,
+                    padding: 10,
                   }}
                 >
                   <Text
                     style={{
                       fontWeight: "bold",
-                      color: "#333",
-                      textAlign: "center",
+                      fontSize: 14,
                     }}
                   >
-                    {item.name || "Không có tên sản phẩm"}
+                    {item.name}
                   </Text>
-                  <Text>Số lượng: {item.quantity}</Text>
-                  <Text>Giá: {item.price} $</Text>
-                  <Text>Size: {item.size}</Text>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: "#555",
+                    }}
+                  >
+                    Quantity: {item.quantity}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: "#555",
+                    }}
+                  >
+                    {`Price: ${Math.floor(item.price)} $`}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: "#555",
+                    }}
+                  >
+                    Size: {item.size}
+                  </Text>
                 </View>
               )}
             />

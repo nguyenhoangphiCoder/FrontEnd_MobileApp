@@ -14,6 +14,7 @@ import CategoryProductsScreen from "../component/CategoriesDetail";
 import ProductDetail from "../component/ProductDetail";
 import Order from "../Screens/Order";
 import OrderHistory from "../component/OrderHistory";
+import ForgotPasswordScreen from "../component/ResetPassword";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -44,6 +45,10 @@ const NavigationStack = () => {
         <Stack.Screen
           name="CategoriesDetail"
           component={CategoryProductsScreen}
+        />
+        <Stack.Screen
+          name="ForgotPasswordScreen"
+          component={ForgotPasswordScreen}
         />
         <Stack.Screen name="Order" component={Order} />
         <Stack.Screen name="ProductDetail" component={ProductDetail} />

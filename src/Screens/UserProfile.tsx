@@ -120,7 +120,7 @@ export default function UserProfile({ navigation }: UserProfileProps) {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff", marginTop: 30 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#eee", marginTop: 30 }}>
       <View
         style={{
           backgroundColor: "#fff",
@@ -188,11 +188,15 @@ export default function UserProfile({ navigation }: UserProfileProps) {
               marginLeft: 15,
               height: 35,
               width: 90,
-              backgroundColor: "#eee",
+              backgroundColor: "#fff",
               borderRadius: 20,
               alignItems: "center",
               justifyContent: "center",
-              borderWidth: 2,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 5,
+              elevation: 5,
             }}
             onPress={() => navigation.navigate("UpdateUserProfile")}
           >
@@ -203,7 +207,7 @@ export default function UserProfile({ navigation }: UserProfileProps) {
 
       <View
         style={{
-          backgroundColor: "#fff",
+          backgroundColor: "#eee",
           paddingVertical: 20,
           marginTop: 40,
           paddingHorizontal: 20,
@@ -216,7 +220,12 @@ export default function UserProfile({ navigation }: UserProfileProps) {
             height: 60,
             borderRadius: 20,
             paddingHorizontal: 15,
-            borderWidth: 1,
+            backgroundColor: "#fff",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 5,
+            elevation: 5,
           }}
         >
           <Text style={{ fontSize: 15, fontWeight: "bold", color: "#230C02" }}>
@@ -225,12 +234,17 @@ export default function UserProfile({ navigation }: UserProfileProps) {
         </View>
         <View
           style={{
-            borderWidth: 1,
+            backgroundColor: "#fff",
             justifyContent: "center",
             marginVertical: 10,
             height: 60,
             borderRadius: 20,
             paddingHorizontal: 15,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 5,
+            elevation: 5,
           }}
         >
           <Text style={{ fontSize: 15, fontWeight: "bold", color: "#230C02" }}>
@@ -241,12 +255,17 @@ export default function UserProfile({ navigation }: UserProfileProps) {
         {/* Hiển thị địa chỉ */}
         <View
           style={{
-            borderWidth: 1,
+            backgroundColor: "#fff",
             justifyContent: "center",
             marginVertical: 10,
             height: 60,
             borderRadius: 20,
             paddingHorizontal: 15,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 5,
+            elevation: 5,
           }}
         >
           <Text
@@ -276,6 +295,11 @@ export default function UserProfile({ navigation }: UserProfileProps) {
             height: 60,
             borderRadius: 20,
             justifyContent: "center",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 5,
+            elevation: 5,
           }}
         >
           <Text style={{ fontSize: 20, fontWeight: "bold", color: "#fff" }}>
@@ -291,6 +315,11 @@ export default function UserProfile({ navigation }: UserProfileProps) {
             height: 60,
             borderRadius: 20,
             justifyContent: "center",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 5,
+            elevation: 5,
           }}
           onPress={handleLogout}
         >

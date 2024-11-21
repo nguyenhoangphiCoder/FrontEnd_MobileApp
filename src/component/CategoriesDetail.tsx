@@ -42,6 +42,7 @@ type RootDrawerParamList = {
   };
   CategoryProducts: { category_id: number; name: string };
   ProductDetail: { id: number; user_id: number };
+  Cart: { user_id: number };
 };
 
 interface CategoryProductsScreenProps {
@@ -160,6 +161,11 @@ export default function CategoryProductsScreen({
     // Điều hướng và truyền productId cùng với user_id
     navigation.navigate("ProductDetail", { id: productId, user_id });
   };
+  const handleNavigationToCart = async () => {
+    const user_id_string = await getUserId();
+    const user_id = user_id_string ? parseInt(user_id_string) : 0;
+    navigation.navigate("Cart", { user_id });
+  };
 
   return (
     <SafeAreaView style={{ backgroundColor: "#eee", flex: 1, paddingTop: 30 }}>
@@ -173,7 +179,9 @@ export default function CategoryProductsScreen({
           }}
         >
           <TouchableOpacity
-            onPress={() => navigation.navigate("Home")}
+            onPress={() => {
+              navigation.goBack();
+            }}
             style={{ padding: 10 }}
           >
             <Image
@@ -199,7 +207,7 @@ export default function CategoryProductsScreen({
             />
           </View>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={handleNavigationToCart}
             style={{ padding: 10 }}
           >
             <Image

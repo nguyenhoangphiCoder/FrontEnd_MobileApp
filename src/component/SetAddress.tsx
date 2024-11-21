@@ -101,12 +101,10 @@ export default function SetAddress({ navigation }: SetAddressProps) {
   };
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: "#D3C0AB", marginTop: 30 }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#eee", marginTop: 30 }}>
       <View
         style={{
-          backgroundColor: "#EDDCC6",
+          backgroundColor: "#eee",
           height: 50,
           flexDirection: "row",
           alignItems: "center",
@@ -128,11 +126,16 @@ export default function SetAddress({ navigation }: SetAddressProps) {
           style={{
             height: 45,
             borderRadius: 20,
-            backgroundColor: "#EDDCC6",
-            borderWidth: 1,
+            backgroundColor: "#fff",
+
             padding: 10,
             marginBottom: 15,
             width: 350,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 100,
           }}
           value={address_line}
           onChangeText={setAddressLine}
@@ -143,11 +146,16 @@ export default function SetAddress({ navigation }: SetAddressProps) {
           style={{
             height: 45,
             borderRadius: 20,
-            backgroundColor: "#EDDCC6",
-            borderWidth: 1,
+            backgroundColor: "#fff",
+
             padding: 10,
             marginBottom: 15,
             width: 350,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 100,
           }}
           value={city}
           onChangeText={setCity}
@@ -157,11 +165,16 @@ export default function SetAddress({ navigation }: SetAddressProps) {
           style={{
             height: 45,
             borderRadius: 20,
-            backgroundColor: "#EDDCC6",
-            borderWidth: 1,
+            backgroundColor: "#fff",
+
             padding: 10,
             marginBottom: 15,
             width: 350,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 100,
           }}
           value={country}
           onChangeText={setCountry}
@@ -169,7 +182,7 @@ export default function SetAddress({ navigation }: SetAddressProps) {
         <TouchableOpacity onPress={updateAddress}>
           <View
             style={{
-              backgroundColor: "#EDDCC6",
+              backgroundColor: "#230C02",
               marginTop: 30,
               height: 40,
               justifyContent: "center",
@@ -178,9 +191,7 @@ export default function SetAddress({ navigation }: SetAddressProps) {
               width: 200,
             }}
           >
-            <Text
-              style={{ color: "#230C02", fontSize: 15, fontWeight: "bold" }}
-            >
+            <Text style={{ color: "#fff", fontSize: 15, fontWeight: "bold" }}>
               Update Address
             </Text>
           </View>

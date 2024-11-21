@@ -16,7 +16,8 @@ import { API_BASE_URL } from "../../ip_API";
 type RootDrawerParamList = {
   Home: undefined;
   SignUp: undefined;
-  MyDrawer: { user: any }; // Cho phép tham số `user`
+  MyDrawer: { user: any };
+  ForgotPasswordScreen: undefined;
 };
 
 interface LoginProps {
@@ -193,7 +194,10 @@ export default function Login({ navigation }: LoginProps) {
           </Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity
+      {/* <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("ForgotPasswordScreen");
+        }}
         style={{
           alignItems: "center",
           justifyContent: "center",
@@ -203,7 +207,7 @@ export default function Login({ navigation }: LoginProps) {
         <Text style={{ color: "#230C02", fontSize: 15, fontWeight: "bold" }}>
           Forgot Your Password?
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </SafeAreaView>
   );
 }

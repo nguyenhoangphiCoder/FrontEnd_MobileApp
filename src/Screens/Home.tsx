@@ -395,7 +395,7 @@ export default function Home({ navigation, route }: HomeProps) {
                     fontWeight: "bold",
                   }}
                 >
-                  {product.price.toLocaleString()} $
+                  {`${Math.floor(product.price)} $`}
                 </Text>
               </TouchableOpacity>
             ))}
