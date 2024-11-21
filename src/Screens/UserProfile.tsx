@@ -38,6 +38,7 @@ export default function UserProfile({ navigation }: UserProfileProps) {
 
   const handleLogout = async () => {
     try {
+      setLoading(true);
       const token = await AsyncStorage.getItem("token");
       const response = await fetch(`${API_BASE_URL}/users/sign-out`, {
         method: "POST",

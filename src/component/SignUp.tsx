@@ -48,7 +48,7 @@ export default function SignUp({ navigation }: SignUpProps) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F5F3" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#eee" }}>
       <View style={{ flexDirection: "row", marginTop: 40, marginLeft: 20 }}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -77,13 +77,16 @@ export default function SignUp({ navigation }: SignUpProps) {
           placeholder="Your name"
           style={{
             height: 50,
-            borderRadius: 10,
-            borderColor: "#230C02",
-            borderWidth: 1,
+            borderRadius: 20,
             paddingLeft: 15,
             fontSize: 16,
             marginBottom: 20,
             backgroundColor: "#FFF",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 5,
           }}
           value={name}
           onChangeText={setName}
@@ -92,13 +95,16 @@ export default function SignUp({ navigation }: SignUpProps) {
           placeholder="Your Email"
           style={{
             height: 50,
-            borderRadius: 10,
-            borderColor: "#230C02",
-            borderWidth: 1,
+            borderRadius: 20,
             paddingLeft: 15,
             fontSize: 16,
             marginBottom: 20,
             backgroundColor: "#FFF",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 5,
           }}
           value={email}
           onChangeText={setEmail}
@@ -108,13 +114,16 @@ export default function SignUp({ navigation }: SignUpProps) {
           secureTextEntry
           style={{
             height: 50,
-            borderRadius: 10,
-            borderColor: "#230C02",
-            borderWidth: 1,
+            borderRadius: 20,
             paddingLeft: 15,
             fontSize: 16,
             marginBottom: 20,
             backgroundColor: "#FFF",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 5,
           }}
           value={password}
           onChangeText={setPassword}
@@ -123,13 +132,16 @@ export default function SignUp({ navigation }: SignUpProps) {
           placeholder="Your phone number"
           style={{
             height: 50,
-            borderRadius: 10,
-            borderColor: "#230C02",
-            borderWidth: 1,
+            borderRadius: 20,
             paddingLeft: 15,
             fontSize: 16,
             marginBottom: 20,
             backgroundColor: "#FFF",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 5,
           }}
           value={phone_number}
           onChangeText={setPhoneNumber}
@@ -146,9 +158,7 @@ export default function SignUp({ navigation }: SignUpProps) {
               marginBottom: 20,
             }}
           >
-            <Text
-              style={{ color: "#EDDCC6", fontSize: 18, fontWeight: "bold" }}
-            >
+            <Text style={{ color: "#fff", fontSize: 18, fontWeight: "bold" }}>
               Create an account
             </Text>
           </View>
@@ -161,9 +171,13 @@ export default function SignUp({ navigation }: SignUpProps) {
               justifyContent: "center",
               alignItems: "center",
               borderRadius: 10,
-              borderWidth: 1,
               borderColor: "#230C02",
               backgroundColor: "#FFF",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+              elevation: 5,
             }}
           >
             <Text

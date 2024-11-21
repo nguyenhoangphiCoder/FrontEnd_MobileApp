@@ -15,6 +15,7 @@ import ProductDetail from "../component/ProductDetail";
 import Order from "../Screens/Order";
 import OrderHistory from "../component/OrderHistory";
 import ForgotPasswordScreen from "../component/ResetPassword";
+import FlashScreen from "../Screens/ScreenFlashView";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -37,7 +38,7 @@ const NavigationStack = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Login"
+        initialRouteName="Flash"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Login" component={Login} />
@@ -56,6 +57,7 @@ const NavigationStack = () => {
         <Stack.Screen name="UpdateUserProfile" component={UpdateUserProfile} />
         <Stack.Screen name="SetAddress" component={SetAddress} />
         <Stack.Screen name="MyDrawer" component={MyDrawer} />
+        <Stack.Screen name="Flash" component={FlashScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

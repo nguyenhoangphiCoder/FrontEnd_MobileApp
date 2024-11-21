@@ -97,7 +97,7 @@ export default function Login({ navigation }: LoginProps) {
   };
 
   return (
-    <SafeAreaView style={{ backgroundColor: "#eee", flex: 1 }}>
+    <SafeAreaView style={{ backgroundColor: "#fff1", flex: 1 }}>
       <Image
         source={require("../images/logo1.jpg")}
         style={{
@@ -186,7 +186,12 @@ export default function Login({ navigation }: LoginProps) {
             alignItems: "center",
             borderRadius: 20,
             borderColor: "#230C02",
-            borderWidth: 2,
+            backgroundColor: "#fff",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 5,
           }}
         >
           <Text style={{ color: "#230C02", fontSize: 15, fontWeight: "bold" }}>
