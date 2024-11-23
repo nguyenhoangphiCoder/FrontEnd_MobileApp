@@ -177,7 +177,6 @@ export default function Home({ navigation, route }: HomeProps) {
             marginLeft: 15,
             width: 280,
             height: 40,
-
             borderRadius: 10,
           }}
         >
@@ -189,7 +188,7 @@ export default function Home({ navigation, route }: HomeProps) {
               paddingHorizontal: 10,
               height: 40,
               fontSize: 15,
-              borderWidth: 2,
+              borderWidth: 1,
             }}
             value={searchTerm}
             onChangeText={setSearchTerm}

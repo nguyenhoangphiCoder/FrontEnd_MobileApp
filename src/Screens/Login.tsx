@@ -17,7 +17,7 @@ type RootDrawerParamList = {
   Home: undefined;
   SignUp: undefined;
   MyDrawer: { user: any };
-  ForgotPasswordScreen: undefined;
+  ForgotPassword: undefined;
 };
 
 interface LoginProps {
@@ -199,9 +199,9 @@ export default function Login({ navigation }: LoginProps) {
           </Text>
         </TouchableOpacity>
       </View>
-      {/* <TouchableOpacity
+      <TouchableOpacity
         onPress={() => {
-          navigation.navigate("ForgotPasswordScreen");
+          navigation.navigate("ForgotPassword");
         }}
         style={{
           alignItems: "center",
@@ -212,7 +212,7 @@ export default function Login({ navigation }: LoginProps) {
         <Text style={{ color: "#230C02", fontSize: 15, fontWeight: "bold" }}>
           Forgot Your Password?
         </Text>
-      </TouchableOpacity> */}
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }

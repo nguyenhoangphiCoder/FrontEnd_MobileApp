@@ -16,6 +16,7 @@ import Order from "../Screens/Order";
 import OrderHistory from "../component/OrderHistory";
 import ForgotPasswordScreen from "../component/ResetPassword";
 import FlashScreen from "../Screens/ScreenFlashView";
+import ResetPasswordScreen from "../component/ResetPasswordScreen";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -27,7 +28,6 @@ const MyDrawer = () => {
       screenOptions={{ headerShown: false }}
     >
       <Drawer.Screen name="Home" component={Home} />
-
       <Drawer.Screen name="OrderHistory" component={OrderHistory} />
       <Drawer.Screen name="UserProfile" component={UserProfile} />
     </Drawer.Navigator>
@@ -47,10 +47,8 @@ const NavigationStack = () => {
           name="CategoriesDetail"
           component={CategoryProductsScreen}
         />
-        <Stack.Screen
-          name="ForgotPasswordScreen"
-          component={ForgotPasswordScreen}
-        />
+        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
         <Stack.Screen name="Order" component={Order} />
         <Stack.Screen name="ProductDetail" component={ProductDetail} />
         <Stack.Screen name="Cart" component={Cart} />

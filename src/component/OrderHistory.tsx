@@ -101,11 +101,11 @@ export default function OrderHistory({ navigation }: OrderHistoryProps) {
                 const productResponse = await axios.get(
                   `${API_BASE_URL}/products/${item.product_id}`
                 );
-                const product = productResponse.data;
+                const products = productResponse.data;
 
                 return {
                   ...item,
-                  name: product.name || "Không có tên sản phẩm",
+                  name: products.name || "Không có tên sản phẩm",
                   price: item.price,
                 };
               } catch (error) {

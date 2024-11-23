@@ -6,7 +6,7 @@ export default function FlashScreen({ navigation }: { navigation: any }) {
     // Chuyển sang màn hình Login sau 3 giây
     const timer = setTimeout(() => {
       navigation.replace("Login");
-    }, 3000000); // Thời gian chuyển màn hình
+    }, 3000); // Thời gian chuyển màn hình
 
     return () => clearTimeout(timer);
   }, [navigation]);

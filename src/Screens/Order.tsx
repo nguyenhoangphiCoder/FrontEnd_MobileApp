@@ -43,7 +43,7 @@ type RootDrawerParamList = {
     totalPrice: number;
     user_id: number;
     orderId: number;
-    products: {
+    product: {
       product_id: number;
       product_name: string;
       product_image: string;
@@ -188,7 +188,7 @@ export default function Order({ navigation, route }: OrderProps) {
         totalPrice,
         user_id,
         orderId,
-        products: updatedCartItems.map((item) => ({
+        product: updatedCartItems.map((item) => ({
           product_id: item.product.id,
           product_name: item.product.name,
           product_image: item.product.image,
