@@ -8,24 +8,24 @@ import {
   ActivityIndicator,
 } from "react-native";
 import axios from "axios";
-import { API_BASE_URL } from "../../ip_API";
+import { API_BASE_URL } from "../../ip_API"; // Đảm bảo đã cấu hình đúng API_BASE_URL
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import * as Crypto from "expo-crypto"; // Sử dụng expo-crypto
 
 type RootDrawerParamList = {
   Home: undefined;
   OrderHistory: undefined;
   ForgotPassword: undefined;
-  ResetPassword: { token: string; userId: number };
+  ResetPassword: { userId: number };
 };
 
 const ForgotPasswordScreen = () => {
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const navigation =
     useNavigation<StackNavigationProp<RootDrawerParamList, "ForgotPassword">>();
 
+  // Hàm xử lý yêu cầu tạo token đặt lại mật khẩu
   const handleForgotPassword = async () => {
     if (!email) {
       Alert.alert("Lỗi", "Vui lòng nhập email.");
@@ -35,20 +35,18 @@ const ForgotPasswordScreen = () => {
     setLoading(true);
 
     try {
-      // Gửi yêu cầu đến API để tìm người dùng theo email
+      // Lấy thông tin người dùng từ email
       const userResponse = await axios.get(
-        `${API_BASE_URL}/users/email/${email}`
+        `${API_BASE_URL}/users/email/${email}` // API lấy userId theo email
       );
-
       console.log(userResponse);
 
-      // Kiểm tra xem người dùng có tồn tại không
+      // Kiểm tra nếu user không tồn tại hoặc không có id
       if (!userResponse.data || !userResponse.data.id) {
         Alert.alert("Lỗi", "Email không tồn tại.");
         return;
       }
 
-      // Lấy id người dùng từ phản hồi
       const userId = Number(userResponse.data.id); // Chuyển đổi sang number nếu cần
 
       // Kiểm tra nếu userId không phải là số hợp lệ
@@ -57,27 +55,21 @@ const ForgotPasswordScreen = () => {
         return;
       }
 
-      // Sử dụng expo-crypto để tạo token
-      const token = await Crypto.getRandomBytesAsync(6).then((bytes) =>
-        bytes.map((byte) => byte.toString(6).padStart(2, "0")).join("")
-      );
+      console.log("UserId:", userId); // Kiểm tra userId
 
-      // Gửi yêu cầu tạo token đặt lại mật khẩu vào API
+      // Gửi yêu cầu tạo token đặt lại mật khẩu
       const response = await axios.post(
-        `${API_BASE_URL}/password_reset_tokens`,
-        {
-          user_id: userId, // Gửi userId dưới dạng số
-          token: token,
-          expired_at: new Date(
-            new Date().getTime() + 15 * 60 * 1000
-          ).toISOString(), // Tạo thời gian hết hạn token
-        }
+        `${API_BASE_URL}/password_reset_tokens/send`,
+        { email }
       );
 
-      // Thông báo thành công
-      Alert.alert("Thành công", "Token đặt lại mật khẩu đã được gửi!");
-      navigation.navigate("ResetPassword", { token, userId: userId }); // Điều hướng đến màn hình đặt lại mật khẩu
-      setEmail(""); // Xóa trường nhập email
+      // Kiểm tra phản hồi từ API
+      if (response.data) {
+        Alert.alert("Thành công", "Token đặt lại mật khẩu đã được gửi!");
+        navigation.navigate("ResetPassword", { userId });
+      } else {
+        Alert.alert("Lỗi", "Không thể tạo token đặt lại mật khẩu.");
+      }
     } catch (error) {
       console.error("Error: ", error);
       if (axios.isAxiosError(error)) {
@@ -125,7 +117,7 @@ const ForgotPasswordScreen = () => {
           backgroundColor: "#fff",
           fontSize: 16,
         }}
-        placeholder="What Your Email ?"
+        placeholder="What is your email?"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"

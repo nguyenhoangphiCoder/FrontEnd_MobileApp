@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, Alert } from "react-native";
 import axios from "axios";
-import { API_BASE_URL } from "../../ip_API";
+import { API_BASE_URL } from "../../ip_API"; // Đảm bảo API_BASE_URL đã được khai báo đúng
 import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 
@@ -10,30 +10,31 @@ type RootDrawerParamList = {
   Home: undefined;
   OrderHistory: undefined;
   ForgotPassword: undefined;
-  ResetPassword: { token: string; userId: string }; // Đảm bảo có userId và token
-  Login: undefined;
+  ResetPassword: { userId: number };
 };
+
 type RootStackParamList = {
   Login: undefined;
 };
 
 const ResetPasswordScreen = () => {
-  const [password, setNewPassword] = useState("");
+  const [new_password, setNewPassword] = useState("");
+  const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
   const route = useRoute<RouteProp<RootDrawerParamList, "ResetPassword">>();
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const { token } = route.params || {}; // Lấy token từ params
+  const { userId } = route.params || {}; // Lấy userId từ params
 
   useEffect(() => {
-    if (!token) {
+    if (!userId) {
       Alert.alert("Lỗi", "Thông tin không hợp lệ.");
-      navigation.goBack(); // Trở lại màn hình trước nếu không có token
+      navigation.goBack(); // Trở lại màn hình trước nếu không có userId
     }
-  }, [token, navigation]);
+  }, [userId, navigation]);
 
   const handleResetPassword = async () => {
-    if (!password) {
-      Alert.alert("Lỗi", "Vui lòng nhập mật khẩu mới.");
+    if (!new_password || !token) {
+      Alert.alert("Lỗi", "Vui lòng nhập đủ mật khẩu mới và token.");
       return;
     }
 
@@ -41,15 +42,20 @@ const ResetPasswordScreen = () => {
 
     try {
       // Gọi API để thay đổi mật khẩu người dùng
-      await axios.put(`${API_BASE_URL}/password_reset_tokens`, {
-        token: token, // Gửi token
-        new_password: password, // Gửi mật khẩu mới
-      });
+      const response = await axios.put(
+        `${API_BASE_URL}/password_reset_tokens`, // Cập nhật đường dẫn API cho đúng
+        {
+          token,
+          new_password,
+        }
+      );
 
-      Alert.alert("Thành công", "Mật khẩu của bạn đã được thay đổi.");
-
-      // Chuyển hướng về màn hình đăng nhập sau khi thành công
-      navigation.navigate("Login");
+      if (response.status === 200) {
+        Alert.alert("Thành công", "Mật khẩu của bạn đã được thay đổi.");
+        navigation.navigate("Login"); // Điều hướng về màn hình Login
+      } else {
+        Alert.alert("Lỗi", "Không thể thay đổi mật khẩu. Vui lòng thử lại.");
+      }
     } catch (error) {
       console.error(error);
       Alert.alert("Lỗi", "Không thể thay đổi mật khẩu. Vui lòng thử lại.");
@@ -64,7 +70,7 @@ const ResetPasswordScreen = () => {
         flex: 1,
         justifyContent: "center",
         padding: 16,
-        backgroundColor: "#eee", // Đổi màu nền
+        backgroundColor: "#eee",
       }}
     >
       <Text
@@ -77,18 +83,20 @@ const ResetPasswordScreen = () => {
       >
         Reset Password
       </Text>
-      {/* Nếu muốn không hiển thị token, có thể loại bỏ phần này */}
+
       <TextInput
         style={{
           borderWidth: 1,
           padding: 10,
           marginBottom: 16,
           borderRadius: 5,
+          color: "black",
         }}
-        placeholder="token:"
+        placeholder="Token"
         value={token}
-        editable={false} // Không cho chỉnh sửa token
+        onChangeText={setToken}
       />
+
       <TextInput
         style={{
           borderWidth: 1,
@@ -98,15 +106,16 @@ const ResetPasswordScreen = () => {
           color: "black",
         }}
         placeholder="New Password"
-        value={password}
+        value={new_password}
         onChangeText={setNewPassword}
         secureTextEntry
       />
+
       <Button
         title="Change Password"
         onPress={handleResetPassword}
         disabled={loading}
-        color="#230C02" // Đổi màu nút
+        color="#230C02"
       />
     </View>
   );
