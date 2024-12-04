@@ -13,7 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_BASE_URL } from "../../ip_API";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useFocusEffect } from "@react-navigation/native";
-
+import AntDesign from "@expo/vector-icons/AntDesign";
 interface Order {
   id: number;
   created_at: string;
@@ -22,7 +22,7 @@ interface Order {
   user: User;
   franchise: Franchise | null;
   order_items: OrderItem[];
-  totalPrice?: number;
+  totalPrice?: number | string | undefined;
 }
 
 interface PaymentMethod {
@@ -203,10 +203,7 @@ export default function OrderHistory({ navigation }: OrderHistoryProps) {
         }}
       >
         <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-          <Image
-            source={require("../images/vector-back-icon.jpg")}
-            style={{ height: 37, width: 37, borderRadius: 5 }}
-          />
+          <AntDesign name="arrowleft" size={30} color="#fff" paddingLeft={10} />
         </TouchableOpacity>
         <Text
           style={{
@@ -264,16 +261,16 @@ export default function OrderHistory({ navigation }: OrderHistoryProps) {
             </View>
             <View>
               <View>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: "bold",
-
-                    marginVertical: 10,
-                  }}
-                >
-                  Total: {item.totalPrice} $
-                </Text>
+                <View>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {`Total: ${Math.floor(item.totalPrice)} $`}
+                  </Text>
+                </View>
 
                 {item.payment_method && (
                   <View style={{ marginBottom: 15 }}>
@@ -310,6 +307,7 @@ export default function OrderHistory({ navigation }: OrderHistoryProps) {
             >
               Products
             </Text>
+
             <FlatList
               data={item.order_items}
               keyExtractor={(orderItem, index) => index.toString()}

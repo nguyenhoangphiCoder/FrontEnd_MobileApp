@@ -14,7 +14,7 @@ import { NavigationProp, RouteProp } from "@react-navigation/native";
 import axios from "axios";
 import { API_BASE_URL } from "../../ip_API";
 import { StackNavigationProp } from "@react-navigation/stack";
-
+import AntDesign from "@expo/vector-icons/AntDesign";
 interface CartItem {
   id: number;
   product: {
@@ -222,12 +222,9 @@ export default function Order({ navigation, route }: OrderProps) {
       >
         <TouchableOpacity
           onPress={() => navigation.navigate("Home")}
-          style={{ padding: 5, marginRight: 15 }}
+          style={{ padding: 5 }}
         >
-          <Image
-            source={require("../images/vector-back-icon.jpg")}
-            style={{ height: 30, width: 30, borderRadius: 5 }}
-          />
+          <AntDesign name="arrowleft" size={30} color="black" />
         </TouchableOpacity>
         <Text
           style={{

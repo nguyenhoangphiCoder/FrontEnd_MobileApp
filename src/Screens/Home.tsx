@@ -14,7 +14,7 @@ import { DrawerNavigationProp } from "@react-navigation/drawer";
 import axios from "axios";
 import { API_BASE_URL } from "../../ip_API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import AntDesign from "@expo/vector-icons/AntDesign";
 type RootDrawerParamList = {
   Home: undefined;
   Order: undefined;
@@ -154,10 +154,10 @@ export default function Home({ navigation, route }: HomeProps) {
   };
 
   return (
-    <SafeAreaView style={{ backgroundColor: "#eee", flex: 1, marginTop: 20 }}>
+    <SafeAreaView style={{ backgroundColor: "#eee", flex: 1, marginTop: 30 }}>
       <View
         style={{
-          backgroundColor: "#fff",
+          backgroundColor: "#eee",
           height: 70,
           flexDirection: "row",
           alignItems: "center",
@@ -165,40 +165,35 @@ export default function Home({ navigation, route }: HomeProps) {
       >
         <TouchableOpacity
           onPress={() => navigation.openDrawer()}
-          style={{ marginLeft: 10 }}
+          style={{ marginLeft: 5 }}
         >
-          <Image
-            source={require("../images/mobile.png")}
-            style={{ height: 35, width: 35, borderRadius: 5 }}
-          />
+          <AntDesign name="bars" size={35} color="black" />
         </TouchableOpacity>
         <View
           style={{
-            marginLeft: 15,
-            width: 280,
-            height: 40,
+            width: 300,
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: "#fff",
             borderRadius: 10,
+            paddingHorizontal: 10,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 5,
+            elevation: 5,
+            marginHorizontal: 5,
           }}
         >
           <TextInput
-            placeholder="Search"
-            style={{
-              backgroundColor: "#fff",
-              borderRadius: 15,
-              paddingHorizontal: 10,
-              height: 40,
-              fontSize: 15,
-              borderWidth: 1,
-            }}
             value={searchTerm}
             onChangeText={setSearchTerm}
+            placeholder="Search products..."
+            style={{ height: 35, fontSize: 14 }}
           />
         </View>
         <TouchableOpacity onPress={handleGoToCart} style={{ marginRight: 10 }}>
-          <Image
-            source={require("../images/cart.png")}
-            style={{ height: 40, width: 40, borderRadius: 5, marginLeft: 10 }}
-          />
+          <AntDesign name="shoppingcart" size={35} color="black" />
         </TouchableOpacity>
       </View>
 

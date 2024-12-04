@@ -9,7 +9,7 @@ import {
 import axios from "axios";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { API_BASE_URL } from "../../ip_API";
-
+import AntDesign from "@expo/vector-icons/AntDesign";
 // Định nghĩa kiểu cho sản phẩm và kích cỡ
 interface Product {
   id: number;
@@ -217,10 +217,7 @@ export default function ProductDetail({
               borderRadius: 50,
             }}
           >
-            <Image
-              source={require("../images/vector-back-icon.jpg")}
-              style={{ height: 30, width: 30 }}
-            />
+            <AntDesign name="arrowleft" size={30} color="black" />
           </TouchableOpacity>
         </View>
       </View>

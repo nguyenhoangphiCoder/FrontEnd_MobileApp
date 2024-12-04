@@ -12,7 +12,7 @@ import { NavigationProp } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { API_BASE_URL } from "../../ip_API";
-
+import AntDesign from "@expo/vector-icons/AntDesign";
 interface UpdateUserProfileProps {
   navigation: NavigationProp<any>;
 }
@@ -105,12 +105,9 @@ export default function UpdateUserProfile({
       >
         <TouchableOpacity
           onPress={() => navigation.navigate("UserProfile")}
-          style={{ padding: 10 }}
+          style={{}}
         >
-          <Image
-            source={require("../images/vector-back-icon.jpg")}
-            style={{ height: 25, width: 25 }}
-          />
+          <AntDesign name="arrowleft" size={30} color="black" />
         </TouchableOpacity>
         <Text
           style={{

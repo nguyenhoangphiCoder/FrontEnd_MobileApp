@@ -12,7 +12,7 @@ import axios from "axios";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { API_BASE_URL } from "../../ip_API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import AntDesign from "@expo/vector-icons/AntDesign";
 interface Product {
   id: number;
   name: string;
@@ -184,10 +184,7 @@ export default function CategoryProductsScreen({
             }}
             style={{ padding: 10 }}
           >
-            <Image
-              source={require("../images/vector-back-icon.jpg")}
-              style={{ height: 30, width: 30, borderRadius: 5 }}
-            />
+            <AntDesign name="arrowleft" size={30} color="#fff" />
           </TouchableOpacity>
           <View
             style={{
@@ -195,25 +192,22 @@ export default function CategoryProductsScreen({
               flexDirection: "row",
               alignItems: "center",
               backgroundColor: "#fff",
-              borderRadius: 20,
-              paddingHorizontal: 10,
+              borderRadius: 10,
+              paddingHorizontal: 5,
             }}
           >
             <TextInput
               value={searchTerm}
               onChangeText={setSearchTerm}
               placeholder="Search products..."
-              style={{ flex: 1, height: 40, fontSize: 16 }}
+              style={{ flex: 1, height: 35, fontSize: 14 }}
             />
           </View>
           <TouchableOpacity
             onPress={handleNavigationToCart}
             style={{ padding: 10 }}
           >
-            <Image
-              source={require("../images/cart.jpg")}
-              style={{ height: 30, width: 30, borderRadius: 5 }}
-            />
+            <AntDesign name="shoppingcart" size={30} color="#fff" />
           </TouchableOpacity>
         </View>
         <Text

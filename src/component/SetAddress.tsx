@@ -12,7 +12,7 @@ import { NavigationProp } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { API_BASE_URL } from "../../ip_API";
-
+import AntDesign from "@expo/vector-icons/AntDesign";
 interface SetAddressProps {
   navigation: NavigationProp<any>;
 }
@@ -111,9 +111,11 @@ export default function SetAddress({ navigation }: SetAddressProps) {
         }}
       >
         <TouchableOpacity onPress={() => navigation.navigate("UserProfile")}>
-          <Image
-            source={require("../images/vector-back-icon.jpg")}
-            style={{ height: 37, width: 37, borderRadius: 5 }}
+          <AntDesign
+            name="arrowleft"
+            size={30}
+            color="black"
+            paddingLeft={10}
           />
         </TouchableOpacity>
         <Text style={{ fontSize: 20, fontWeight: "bold", marginLeft: 80 }}>

@@ -10,7 +10,7 @@ import React, { useState } from "react";
 import { NavigationProp } from "@react-navigation/native";
 import axios, { AxiosError } from "axios";
 import { API_BASE_URL } from "../../ip_API";
-
+import AntDesign from "@expo/vector-icons/AntDesign";
 interface SignUpProps {
   navigation: NavigationProp<any>;
 }
@@ -54,9 +54,7 @@ export default function SignUp({ navigation }: SignUpProps) {
           onPress={() => navigation.goBack()}
           style={{ padding: 10 }}
         >
-          <Text style={{ fontSize: 18, color: "#230C02", fontWeight: "bold" }}>
-            Back
-          </Text>
+          <AntDesign name="arrowleft" size={30} color="black" />
         </TouchableOpacity>
       </View>
 

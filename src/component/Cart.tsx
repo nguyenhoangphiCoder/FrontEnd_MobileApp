@@ -11,6 +11,7 @@ import {
 import axios from "axios";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { API_BASE_URL } from "../../ip_API";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 interface CartItem {
   id: number;
@@ -171,7 +172,7 @@ export default function Cart({ navigation, route }: CartProps) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff", paddingTop: 20 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff", paddingTop: 30 }}>
       <View
         style={{
           height: 60,
@@ -181,16 +182,18 @@ export default function Cart({ navigation, route }: CartProps) {
           paddingHorizontal: 20,
         }}
       >
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={{ padding: 10 }}
-        >
-          <Image
-            source={require("../images/vector-back-icon.jpg")}
-            style={{ height: 30, width: 30, borderRadius: 5 }}
-          />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <AntDesign name="arrowleft" size={30} color="#fff" />
         </TouchableOpacity>
-        <Text style={{ fontSize: 22, fontWeight: "bold", color: "#fff" }}>
+        <Text
+          style={{
+            fontSize: 22,
+            fontWeight: "bold",
+            color: "#fff",
+            flex: 1,
+            textAlign: "center",
+          }}
+        >
           My Cart
         </Text>
       </View>

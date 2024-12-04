@@ -170,7 +170,14 @@ export default function Login({ navigation }: LoginProps) {
             height: 40,
             justifyContent: "center",
             alignItems: "center",
-            borderRadius: 20,
+            borderRadius: 10,
+            borderColor: "#230C02",
+
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.5,
+            shadowRadius: 10,
+            elevation: 5,
           }}
         >
           <Text style={{ color: "#fff", fontSize: 15, fontWeight: "bold" }}>
@@ -184,13 +191,13 @@ export default function Login({ navigation }: LoginProps) {
             height: 40,
             justifyContent: "center",
             alignItems: "center",
-            borderRadius: 20,
+            borderRadius: 10,
             borderColor: "#230C02",
             backgroundColor: "#fff",
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
+            shadowOpacity: 0.5,
+            shadowRadius: 10,
             elevation: 5,
           }}
         >

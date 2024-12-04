@@ -10,7 +10,7 @@ import React, { useEffect, useState } from "react";
 import { NavigationProp } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_BASE_URL } from "../../ip_API";
-
+import AntDesign from "@expo/vector-icons/AntDesign";
 interface UserProfileProps {
   navigation: NavigationProp<any>;
 }
@@ -139,13 +139,17 @@ export default function UserProfile({ navigation }: UserProfileProps) {
           onPress={() => navigation.navigate("Home")}
           style={{ padding: 5, marginRight: 10 }}
         >
-          <Image
-            source={require("../images/vector-back-icon.jpg")}
-            style={{ height: 37, width: 37, borderRadius: 5 }}
-          />
+          <AntDesign name="arrowleft" size={30} color="black" />
         </TouchableOpacity>
-        <View style={{}}>
-          <Text style={{ fontSize: 24, fontWeight: "bold", color: "#230C02" }}>
+        <View style={{ flex: 1, marginRight: 35 }}>
+          <Text
+            style={{
+              fontSize: 24,
+              fontWeight: "bold",
+              color: "#230C02",
+              textAlign: "center",
+            }}
+          >
             Account
           </Text>
         </View>
