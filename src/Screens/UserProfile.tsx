@@ -160,14 +160,12 @@ export default function UserProfile({ navigation }: UserProfileProps) {
       >
         <Image
           source={{
-            uri: user?.avatar_url || `no avatar`,
+            uri: user?.avatar_url || "http://via.placeholder.com/100x100",
           }}
           style={{
             height: 200,
             width: 200,
             borderRadius: 100,
-
-            backgroundColor: "#FFEB3B",
           }}
           onError={() => {
             console.log("Error loading avatar, using default avatar");

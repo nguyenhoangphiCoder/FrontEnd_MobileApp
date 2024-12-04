@@ -259,17 +259,21 @@ export default function CategoryProductsScreen({
                 width: 80,
                 marginRight: 15,
                 borderRadius: 10,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
               }}
             />
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold", color: "#333" }}>
+              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
                 {item.name}
               </Text>
-              <Text style={{ fontSize: 16, color: "#333" }}>
+              <Text style={{ fontSize: 13, color: "#333" }}>
                 {item.description}
               </Text>
             </View>
-            <Text style={{ fontSize: 18, fontWeight: "bold", color: "#333" }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
               ${Math.floor(adjustedPrices[item.id])}
             </Text>
           </TouchableOpacity>

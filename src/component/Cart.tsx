@@ -23,6 +23,10 @@ interface CartItem {
     id: number;
   };
 }
+interface ProductImage {
+  product: { id: number };
+  image_url: string;
+}
 
 type RootDrawerParamList = {
   Home: undefined;
@@ -77,14 +81,16 @@ export default function Cart({ navigation, route }: CartProps) {
               const productImagesResponse = await axios.get(
                 `${API_BASE_URL}/product_images?product_id=${item.product_id}`
               );
-
-              const imageUrl = productImagesResponse.data[0]?.image_url || null;
+              const productImage = productImagesResponse.data.find(
+                (img: ProductImage) =>
+                  img.product.id === productResponse.data.id
+              );
 
               return {
                 ...item,
                 product: {
                   ...productResponse.data,
-                  image: imageUrl,
+                  image: productImage ? productImage.image_url : null,
                 },
               };
             })
