@@ -22,7 +22,7 @@ interface Order {
   user: User;
   franchise: Franchise | null;
   order_items: OrderItem[];
-  totalPrice?: number | string | undefined;
+  totalPrice: number;
 }
 
 interface PaymentMethod {

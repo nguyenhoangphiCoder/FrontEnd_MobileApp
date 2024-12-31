@@ -25,8 +25,8 @@ interface LoginProps {
 }
 
 export default function Login({ navigation }: LoginProps) {
-  const [email, setEmail] = useState<string>("Phi1@gmail.com");
-  const [password, setPassword] = useState<string>("223322");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
   const api = axios.create({
     baseURL: `${API_BASE_URL}`, // Địa chỉ API của bạn
