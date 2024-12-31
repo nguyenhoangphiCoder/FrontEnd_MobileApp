@@ -52,6 +52,7 @@ type RootDrawerParamList = {
       price: number;
     }[];
   };
+  VisaQRCode: undefined;
 };
 
 interface PaymentMethod {
@@ -151,6 +152,14 @@ export default function Order({ navigation, route }: OrderProps) {
   // Handle selection of payment method
   const handleSelectPaymentMethod = (paymentMethodId: number) => {
     setSelectedPaymentMethodId(paymentMethodId);
+    // Kiểm tra nếu là Visa
+    const selectedMethod = paymentMethods.find(
+      (method) => method.payment_method_id === paymentMethodId
+    );
+
+    if (selectedMethod?.provider_name.toLowerCase() === "visa") {
+      navigation.navigate("VisaQRCode");
+    }
   };
 
   // Confirm order and create order items

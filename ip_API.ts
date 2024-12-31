@@ -1,1 +1,1 @@
-export const API_BASE_URL = "http://192.168.1.23:3000"; // Địa chỉ API gốc
+export const API_BASE_URL = "http://172.14.14.222:3000"; // Địa chỉ API gốc

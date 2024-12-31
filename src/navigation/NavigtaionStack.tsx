@@ -17,6 +17,7 @@ import OrderHistory from "../component/OrderHistory";
 import ForgotPasswordScreen from "../component/ResetPassword";
 import FlashScreen from "../Screens/ScreenFlashView";
 import ResetPasswordScreen from "../component/ResetPasswordScreen";
+import VisaQRCode from "../component/VisaQRCode";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -56,6 +57,7 @@ const NavigationStack = () => {
         <Stack.Screen name="SetAddress" component={SetAddress} />
         <Stack.Screen name="MyDrawer" component={MyDrawer} />
         <Stack.Screen name="Flash" component={FlashScreen} />
+        <Stack.Screen name="VisaQRCode" component={VisaQRCode} />
       </Stack.Navigator>
     </NavigationContainer>
   );
