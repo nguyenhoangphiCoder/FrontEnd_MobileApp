@@ -191,7 +191,10 @@ export default function Order({ navigation, route }: OrderProps) {
           price: adjusted_price,
         });
       }
-
+      // Gửi email hóa đơn
+      await axios.post(`${API_BASE_URL}/orders/send-invoice`, {
+        email: userEmail, // Email người dùng
+      });
       navigation.navigate("Home");
       navigation.navigate("OrderHistory", {
         totalPrice,

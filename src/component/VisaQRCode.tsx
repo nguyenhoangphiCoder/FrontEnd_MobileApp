@@ -32,6 +32,10 @@ export default function VisaQRCode({ navigation }: VisaQRCodeDrop) {
       <Text style={styles.info}>Sacombank</Text>
       <Text style={styles.info}>NGUYEN HOANG PHI</Text>
       <Text style={styles.info}>0701 2027 1022</Text>
+      <Text style={styles.info}>
+        Vui lòng quét mã QR tren hoặc chuyển vào số tài khoản trên để thực hiện
+        thanh toán online.
+      </Text>
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={{

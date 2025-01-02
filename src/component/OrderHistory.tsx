@@ -81,6 +81,7 @@ export default function OrderHistory({ navigation }: OrderHistoryProps) {
         `${API_BASE_URL}/orders/user/${userId}/orders`
       );
       const ordersData: Order[] = response.data;
+      console.log(response);
 
       if (!ordersData || ordersData.length === 0) {
         setError("Không có đơn hàng nào.");
@@ -119,7 +120,7 @@ export default function OrderHistory({ navigation }: OrderHistoryProps) {
           );
 
           const totalPrice = enrichedItems.reduce(
-            (sum, item) => sum + item.price * item.quantity,
+            (sum, item) => sum + item.price,
             0
           );
 
@@ -128,6 +129,7 @@ export default function OrderHistory({ navigation }: OrderHistoryProps) {
       );
 
       setOrders(enrichedOrders);
+      console.log("sdd", setOrders);
     } catch (error) {
       setError("Order History is empty");
     } finally {

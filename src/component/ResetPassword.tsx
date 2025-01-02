@@ -143,7 +143,6 @@ const ForgotPasswordScreen = () => {
           </Text>
         )}
       </TouchableOpacity>
-      {/* {loading && <ActivityIndicator size="large" color="#230C02" />} */}
     </View>
   );
 };
